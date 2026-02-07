@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useI18n } from '@/i18n';
 import type { ThemeFilters, SyntaxRole } from '@/types/theme';
 
 interface FiltersPanelProps {
@@ -8,24 +9,24 @@ interface FiltersPanelProps {
   onChange: (next: ThemeFilters) => void;
 }
 
-const tokenOptions: Array<{ value: ThemeFilters['token']; label: string }> = [
-  { value: 'any', label: 'Any Token' },
-  { value: 'background', label: 'Background' },
-  { value: 'keyword', label: 'Keyword' },
-  { value: 'string', label: 'String' },
-  { value: 'comment', label: 'Comment' },
-  { value: 'function', label: 'Function' },
-  { value: 'variable', label: 'Variable' },
-  { value: 'number', label: 'Number' },
-  { value: 'type', label: 'Type' },
-  { value: 'operator', label: 'Operator' },
+const tokenOptions: Array<{ value: ThemeFilters['token']; key: string }> = [
+  { value: 'any', key: 'filters.token.any' },
+  { value: 'background', key: 'filters.token.background' },
+  { value: 'keyword', key: 'filters.token.keyword' },
+  { value: 'string', key: 'filters.token.string' },
+  { value: 'comment', key: 'filters.token.comment' },
+  { value: 'function', key: 'filters.token.function' },
+  { value: 'variable', key: 'filters.token.variable' },
+  { value: 'number', key: 'filters.token.number' },
+  { value: 'type', key: 'filters.token.type' },
+  { value: 'operator', key: 'filters.token.operator' },
 ];
 
 const bgOptions = ['all', 'dark', 'light', 'blue', 'purple', 'green', 'orange', 'gray', 'mixed'];
 
-const presetColorGroups: Array<{ category: string; colors: Array<{ label: string; hex: string }> }> = [
+const presetColorGroups: Array<{ categoryKey: string; colors: Array<{ label: string; hex: string }> }> = [
   {
-    category: 'Darcula Çekirdeği',
+    categoryKey: 'filters.palette.core',
     colors: [
       { label: 'Background', hex: '#2b2d30' },
       { label: 'Keyword', hex: '#cc7832' },
@@ -36,7 +37,7 @@ const presetColorGroups: Array<{ category: string; colors: Array<{ label: string
     ],
   },
   {
-    category: 'Sıcak Tonlar',
+    categoryKey: 'filters.palette.warm',
     colors: [
       { label: 'Amber', hex: '#ffb347' },
       { label: 'Coral', hex: '#ff7661' },
@@ -47,7 +48,7 @@ const presetColorGroups: Array<{ category: string; colors: Array<{ label: string
     ],
   },
   {
-    category: 'Soğuk Tonlar',
+    categoryKey: 'filters.palette.cool',
     colors: [
       { label: 'Ocean', hex: '#4a88ff' },
       { label: 'Cyan', hex: '#48c9d6' },
@@ -58,7 +59,7 @@ const presetColorGroups: Array<{ category: string; colors: Array<{ label: string
     ],
   },
   {
-    category: 'Nötr Tonlar',
+    categoryKey: 'filters.palette.neutral',
     colors: [
       { label: 'Snow', hex: '#f5f7fa' },
       { label: 'Cloud', hex: '#c9d1d9' },
@@ -83,6 +84,7 @@ function normalizeSixDigitHex(value: string): string {
 }
 
 export function FiltersPanel({ filters, total, filtered, onChange }: FiltersPanelProps) {
+  const { t, formatNumber } = useI18n();
   const [paletteOpen, setPaletteOpen] = useState(false);
   const paletteRef = useRef<HTMLDivElement | null>(null);
   const normalizedHex = useMemo(() => normalizeSixDigitHex(filters.hex), [filters.hex]);
@@ -122,52 +124,52 @@ export function FiltersPanel({ filters, total, filtered, onChange }: FiltersPane
   };
 
   return (
-    <section className="filters-panel" aria-label="Theme filters">
+    <section className="filters-panel" aria-label={t('filters.ariaLabel')}>
       <div className="search-col">
-        <label htmlFor="theme-search">Ara</label>
+        <label htmlFor="theme-search">{t('filters.search')}</label>
         <input
           id="theme-search"
           name="theme-search"
           autoComplete="off"
           value={filters.q}
           onChange={(event) => onChange({ ...filters, q: event.target.value })}
-          placeholder="Tema, yayıncı, açıklama…"
+          placeholder={t('filters.searchPlaceholder')}
         />
       </div>
 
       <div>
-        <label htmlFor="bg-filter">Arkaplan Kategorisi</label>
+        <label htmlFor="bg-filter">{t('filters.bgCategory')}</label>
         <select
           id="bg-filter"
           value={filters.bg}
           onChange={(event) => onChange({ ...filters, bg: event.target.value })}
         >
           {bgOptions.map((item) => (
-            <option key={item} value={item}>{item}</option>
+            <option key={item} value={item}>{t(`filters.bg.${item}`)}</option>
           ))}
         </select>
       </div>
 
       <div>
-        <label htmlFor="token-filter">Token Rolü</label>
+        <label htmlFor="token-filter">{t('filters.tokenRole')}</label>
         <select
           id="token-filter"
           value={filters.token}
           onChange={(event) => onChange({ ...filters, token: event.target.value as SyntaxRole | 'any' | 'background' })}
         >
           {tokenOptions.map((item) => (
-            <option key={item.value} value={item.value}>{item.label}</option>
+            <option key={item.value} value={item.value}>{t(item.key)}</option>
           ))}
         </select>
       </div>
 
       <div>
-        <label htmlFor="hex-filter">HEX</label>
+        <label htmlFor="hex-filter">{t('filters.hex')}</label>
         <div className="hex-filter-wrap" ref={paletteRef}>
           <button
             type="button"
             className="hex-trigger"
-            aria-label="Renk paletini aç"
+            aria-label={t('filters.openPalette')}
             aria-haspopup="dialog"
             aria-expanded={paletteOpen}
             onClick={() => setPaletteOpen((prev) => !prev)}
@@ -183,27 +185,27 @@ export function FiltersPanel({ filters, total, filtered, onChange }: FiltersPane
             placeholder="#cc7832"
           />
           {paletteOpen ? (
-            <div className="hex-popover" role="dialog" aria-label="HEX color palette">
+            <div className="hex-popover" role="dialog" aria-label={t('filters.paletteTitle')}>
               <div className="hex-popover-header">
-                <strong>Renk Paleti</strong>
-                <button type="button" onClick={() => setPaletteOpen(false)}>Kapat</button>
+                <strong>{t('filters.paletteTitle')}</strong>
+                <button type="button" onClick={() => setPaletteOpen(false)}>{t('filters.close')}</button>
               </div>
 
               <div className="hex-custom-picker">
-                <span>Özel Renk</span>
+                <span>{t('filters.customColor')}</span>
                 <input
                   type="color"
                   value={activeColor}
                   onChange={(event) => applyHex(event.target.value)}
-                  aria-label="Özel renk seç"
+                  aria-label={t('filters.customColorAria')}
                 />
                 <code>{activeColor}</code>
               </div>
 
               <div className="hex-preset-groups">
                 {presetColorGroups.map((group) => (
-                  <section key={group.category}>
-                    <h4>{group.category}</h4>
+                  <section key={group.categoryKey}>
+                    <h4>{t(group.categoryKey)}</h4>
                     <div className="hex-preset-grid">
                       {group.colors.map((color) => (
                         <button
@@ -227,7 +229,7 @@ export function FiltersPanel({ filters, total, filtered, onChange }: FiltersPane
       </div>
 
       <div>
-        <label htmlFor="tolerance-filter">Tolerance {filters.tolerance}</label>
+        <label htmlFor="tolerance-filter">{t('filters.tolerance', { value: filters.tolerance })}</label>
         <input
           id="tolerance-filter"
           name="tolerance-filter"
@@ -240,32 +242,32 @@ export function FiltersPanel({ filters, total, filtered, onChange }: FiltersPane
       </div>
 
       <div>
-        <label htmlFor="sort-filter">Sıralama</label>
+        <label htmlFor="sort-filter">{t('filters.sort')}</label>
         <select
           id="sort-filter"
           value={filters.sort}
           onChange={(event) => onChange({ ...filters, sort: event.target.value as ThemeFilters['sort'] })}
         >
-          <option value="name">İsim</option>
-          <option value="publisher">Publisher</option>
-          <option value="background">Arkaplan</option>
+          <option value="name">{t('filters.sort.name')}</option>
+          <option value="publisher">{t('filters.sort.publisher')}</option>
+          <option value="background">{t('filters.sort.background')}</option>
         </select>
       </div>
 
       <div>
-        <label htmlFor="view-filter">Görünüm</label>
+        <label htmlFor="view-filter">{t('filters.view')}</label>
         <select
           id="view-filter"
           value={filters.view}
           onChange={(event) => onChange({ ...filters, view: event.target.value as ThemeFilters['view'] })}
         >
-          <option value="grid">Grid</option>
-          <option value="list">List</option>
+          <option value="grid">{t('filters.view.grid')}</option>
+          <option value="list">{t('filters.view.list')}</option>
         </select>
       </div>
 
       <div className="filter-stats" aria-live="polite">
-        <strong>{filtered.toLocaleString('tr-TR')}</strong> / {total.toLocaleString('tr-TR')} tema
+        {t('filters.stats', { filtered: formatNumber(filtered), total: formatNumber(total) })}
       </div>
     </section>
   );

@@ -1,5 +1,6 @@
 import { useState, type KeyboardEvent, type MouseEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useI18n } from '@/i18n';
 import type { ThemeIndexRecord } from '@/types/theme';
 
 interface ThemeCardProps {
@@ -36,6 +37,7 @@ function Preview({ theme }: { theme: ThemeIndexRecord }) {
 }
 
 export function ThemeCard({ theme, view }: ThemeCardProps) {
+  const { t } = useI18n();
   const navigate = useNavigate();
 
   const goToDetail = (): void => {
@@ -69,7 +71,7 @@ export function ThemeCard({ theme, view }: ThemeCardProps) {
       className={`theme-card is-clickable ${view}`}
       role="link"
       tabIndex={0}
-      aria-label={`${theme.themeDisplayName} detay sayfasını aç`}
+      aria-label={t('card.openDetail', { name: theme.themeDisplayName })}
       onClick={onCardClick}
       onKeyDown={onCardKeyDown}
     >
@@ -89,8 +91,8 @@ export function ThemeCard({ theme, view }: ThemeCardProps) {
           ))}
         </div>
         <div className="theme-actions">
-          <Link to={`/themes/${theme.id}`}>Detay</Link>
-          <Link to={`/builder/${theme.id}`}>VSIX Builder</Link>
+          <Link to={`/themes/${theme.id}`}>{t('card.details')}</Link>
+          <Link to={`/builder/${theme.id}`}>{t('card.vsixBuilder')}</Link>
         </div>
       </div>
     </article>

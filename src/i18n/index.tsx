@@ -1,0 +1,340 @@
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useContext, useEffect, useMemo, useState, type PropsWithChildren } from 'react';
+
+export type Locale = 'en' | 'tr' | 'de' | 'fr' | 'zh' | 'ja' | 'ko' | 'ar' | 'es' | 'pt' | 'hi';
+
+interface I18nContextValue {
+  locale: Locale;
+  setLocale: (next: Locale) => void;
+  t: (key: string, vars?: Record<string, string | number>) => string;
+  formatNumber: (value: number) => string;
+}
+
+const RTL_LOCALES: Locale[] = ['ar'];
+
+const LOCALE_LABELS: Record<Locale, string> = {
+  en: 'English',
+  tr: 'Türkçe',
+  de: 'Deutsch',
+  fr: 'Français',
+  zh: '中文',
+  ja: '日本語',
+  ko: '한국어',
+  ar: 'العربية',
+  es: 'Español',
+  pt: 'Português',
+  hi: 'हिन्दी',
+};
+
+const NUMBER_LOCALE: Record<Locale, string> = {
+  en: 'en-US',
+  tr: 'tr-TR',
+  de: 'de-DE',
+  fr: 'fr-FR',
+  zh: 'zh-CN',
+  ja: 'ja-JP',
+  ko: 'ko-KR',
+  ar: 'ar-SA',
+  es: 'es-ES',
+  pt: 'pt-PT',
+  hi: 'hi-IN',
+};
+
+const EN_MESSAGES: Record<string, string> = {
+  'app.skipToContent': 'Skip to content',
+  'app.loading': 'Loading…',
+  'header.brandSubtitle': 'Global VS Code Theme Explorer',
+  'header.navMain': 'Main navigation',
+  'header.navThemes': 'Themes',
+  'header.navCommunity': 'Community',
+  'header.navDocs': 'Docs',
+  'header.navAbout': 'About',
+  'header.language': 'Language',
+  'hero.title': 'Global Theme Database',
+  'hero.subtitle': 'Pick any color from code and filter across the entire theme database.',
+  'hero.language': 'Sample Programming Language',
+  'home.explorer': 'Theme Explorer',
+  'home.filterResult': 'Filter result: {count} themes',
+  'home.resetFilters': 'Reset Filters',
+  'loading.shards': 'Shard loading: {loaded}/{total} ({ratio}%)',
+  'card.details': 'Details',
+  'card.vsixBuilder': 'VSIX Builder',
+  'card.openDetail': 'Open details for {name}',
+  'filters.ariaLabel': 'Theme filters',
+  'filters.search': 'Search',
+  'filters.searchPlaceholder': 'Theme, publisher, description…',
+  'filters.bgCategory': 'Background Category',
+  'filters.tokenRole': 'Token Role',
+  'filters.hex': 'HEX',
+  'filters.openPalette': 'Open color palette',
+  'filters.paletteTitle': 'Color Palette',
+  'filters.close': 'Close',
+  'filters.customColor': 'Custom Color',
+  'filters.customColorAria': 'Pick custom color',
+  'filters.tolerance': 'Tolerance {value}',
+  'filters.sort': 'Sort',
+  'filters.view': 'View',
+  'filters.stats': '{filtered} / {total} themes',
+  'filters.sort.name': 'Name',
+  'filters.sort.publisher': 'Publisher',
+  'filters.sort.background': 'Background',
+  'filters.view.grid': 'Grid',
+  'filters.view.list': 'List',
+  'filters.token.any': 'Any Token',
+  'filters.token.background': 'Background',
+  'filters.token.keyword': 'Keyword',
+  'filters.token.string': 'String',
+  'filters.token.comment': 'Comment',
+  'filters.token.function': 'Function',
+  'filters.token.variable': 'Variable',
+  'filters.token.number': 'Number',
+  'filters.token.type': 'Type',
+  'filters.token.operator': 'Operator',
+  'filters.bg.all': 'all',
+  'filters.bg.dark': 'dark',
+  'filters.bg.light': 'light',
+  'filters.bg.blue': 'blue',
+  'filters.bg.purple': 'purple',
+  'filters.bg.green': 'green',
+  'filters.bg.orange': 'orange',
+  'filters.bg.gray': 'gray',
+  'filters.bg.mixed': 'mixed',
+  'filters.palette.core': 'Darcula Core',
+  'filters.palette.warm': 'Warm Tones',
+  'filters.palette.cool': 'Cool Tones',
+  'filters.palette.neutral': 'Neutral Tones',
+  'detail.loading': 'Loading theme detail…',
+  'detail.notFound': 'Theme not found.',
+  'detail.backToList': 'Back to list',
+  'detail.exportVsix': 'Export VSIX',
+  'detail.marketplace': 'Marketplace',
+  'detail.tokenPalette': 'Token Palette',
+  'detail.editorColors': 'Editor Colors',
+  'detail.similarThemes': 'Similar Themes',
+  'builder.loading': 'Builder data is loading…',
+  'builder.payloadLoadFailed': 'VSIX payload could not be loaded.',
+  'builder.themeOrPayloadNotFound': 'Theme or payload not found.',
+  'builder.vsixBuildFailed': 'VSIX build failed.',
+  'builder.livePreview': 'Live Preview',
+  'builder.validJson': 'Valid JSON',
+  'builder.needsFix': 'Needs Fix',
+  'builder.previewManifest': 'Real-time view of your extension manifest.',
+  'builder.marketplaceCard': 'MARKETPLACE CARD',
+  'builder.noDescription': 'No description',
+  'builder.themeCategory': 'Theme',
+  'builder.configureTitle': 'Configure VSIX',
+  'builder.configureSubtitle': 'Finalize your extension details and apply last-minute theme tweaks.',
+  'builder.extensionIdentity': 'Extension Identity',
+  'builder.publisherHandle': 'Publisher Handle',
+  'builder.publisherHint': 'Must match your marketplace ID.',
+  'builder.version': 'Version',
+  'builder.displayName': 'Display Name',
+  'builder.uniqueId': 'Unique ID (Name)',
+  'builder.description': 'Description',
+  'builder.categories': 'Categories',
+  'builder.cat.themes': 'Themes',
+  'builder.cat.snippets': 'Snippets',
+  'builder.cat.packs': 'Extension Packs',
+  'builder.quickTweaks': 'Quick Tweaks',
+  'builder.resetDefaults': 'Reset to defaults',
+  'builder.editorBackground': 'Editor Background',
+  'builder.accentColor': 'Accent Color',
+  'builder.backToEditor': 'Back to Editor',
+  'builder.generate': 'Generate & Download VSIX',
+  'builder.packaging': 'Packaging…',
+  'success.title': 'VSIX Package Ready!',
+  'success.generatedFor': '{name} package has been successfully generated.',
+  'success.download': 'Download .vsix',
+  'success.versionSize': 'Version {version} • {size}',
+  'success.source': 'Source: {mode}',
+  'success.installCli': 'Install via Command Line',
+  'success.optional': 'Optional',
+  'success.copy': 'Copy',
+  'success.copied': 'Copied',
+  'success.error': 'Error',
+  'success.installGuide': 'Installation Guide',
+  'success.installGuideSubtitle': 'Follow these steps to activate your theme locally.',
+  'success.step1Title': 'Open VS Code',
+  'success.step1Detail': 'Launch Visual Studio Code on your desktop.',
+  'success.step2Title': 'Go to Extensions',
+  'success.step2Detail': 'Open Extensions panel with Ctrl+Shift+X.',
+  'success.step3Title': 'Open Views Menu',
+  'success.step3Detail': 'Use the top-right menu in Extensions panel.',
+  'success.step4Title': 'Install from VSIX',
+  'success.step4Detail': 'Select "Install from VSIX..." and choose downloaded file.',
+  'success.visualHint': 'Visual Hint',
+  'success.visualHintDesc': 'VS Code Extension Menu',
+  'success.backToExplorer': 'Back to Explorer',
+  'success.viewDocs': 'View Documentation',
+  'about.liveBadge': 'Live Indexing Status: Active',
+  'about.heroCount': '22,000+',
+  'about.heroSubtitle': 'Themes analyzed across the global VS Code ecosystem. We index every color key for precision matching.',
+  'about.statExtensions': 'Extensions',
+  'about.statColorKeys': 'Color Keys',
+  'about.statDailyUpdates': 'Daily Updates',
+  'about.statQueryTime': 'Query Time',
+  'about.algorithmKicker': 'Algorithmic Core',
+  'about.algorithmTitle': 'HSL Color Matching Engine',
+  'about.algorithmBody': 'ThemeDatabase converts colors into HSL space and computes Delta-E distance for perceptually accurate results.',
+  'about.engineDeltaTitle': 'Delta-E Calculation',
+  'about.engineDeltaBody': 'CIE-style color distance matching for reliable visual similarity.',
+  'about.enginePerceptualTitle': 'Perceptual Uniformity',
+  'about.enginePerceptualBody': 'Matches how humans perceive contrast and luminance.',
+  'about.blueprintInput': 'INPUT: #AF25F4',
+  'about.blueprintMatch': '98.4% MATCH',
+  'about.databaseKicker': 'The Database',
+  'about.databaseTitle': 'Global Index',
+  'about.extensionsTracked': 'Extensions Tracked',
+  'about.colorKeysTracked': 'Color Keys',
+  'about.performanceKicker': 'Performance Architecture',
+  'about.performanceTitle': 'Meet the Engine',
+  'about.performanceBody': 'Optimized for low-latency browsing with static shards and virtualized rendering.',
+  'about.perfClientTitle': 'Client-Side Compute',
+  'about.perfClientBody': 'Runs fully in the browser with no backend requirement.',
+  'about.perfShardTitle': 'Sharded Data Loading',
+  'about.perfShardBody': 'Loads only required chunks to keep first render fast.',
+  'about.perfVirtualizedTitle': 'Virtualized Lists',
+  'about.perfVirtualizedBody': 'Large result sets remain smooth while scrolling.',
+  'about.licenseKicker': 'Open Source',
+  'about.licenseTitle': 'MIT License',
+  'about.licenseBody': 'This project is licensed under the MIT License for open use and modification.',
+  'about.licenseBadge': 'MIT',
+  'about.licenseView': 'View LICENSE',
+};
+
+// Keep non-English packs compact; keys not present fall back to English.
+const MESSAGES: Record<Locale, Record<string, string>> = {
+  en: EN_MESSAGES,
+  tr: {
+    'app.skipToContent': 'İçeriğe geç',
+    'app.loading': 'Yükleniyor…',
+    'header.brandSubtitle': 'Global VS Code Tema Gezgini',
+    'header.navThemes': 'Temalar',
+    'header.navCommunity': 'Topluluk',
+    'header.navDocs': 'Dokümanlar',
+    'header.navAbout': 'Hakkında',
+    'header.language': 'Dil',
+    'hero.subtitle': 'Kod içindeki herhangi bir rengi seç ve tüm tema veritabanında filtrele.',
+    'hero.language': 'Örnek Programlama Dili',
+    'home.filterResult': 'Filtre sonucu: {count} tema',
+    'home.resetFilters': 'Filtreleri Sıfırla',
+    'loading.shards': 'Shard yükleme: {loaded}/{total} ({ratio}%)',
+    'card.details': 'Detay',
+    'filters.search': 'Ara',
+    'filters.bgCategory': 'Arkaplan Kategorisi',
+    'filters.tokenRole': 'Token Rolü',
+    'filters.openPalette': 'Renk paletini aç',
+    'filters.paletteTitle': 'Renk Paleti',
+    'filters.close': 'Kapat',
+    'filters.customColor': 'Özel Renk',
+    'filters.customColorAria': 'Özel renk seç',
+    'filters.sort': 'Sıralama',
+    'filters.view': 'Görünüm',
+    'filters.sort.name': 'İsim',
+    'detail.loading': 'Tema detayı yükleniyor…',
+    'detail.notFound': 'Tema bulunamadı.',
+    'detail.backToList': 'Listeye dön',
+    'detail.similarThemes': 'Benzer Temalar',
+    'builder.loading': 'Builder verisi yükleniyor…',
+    'builder.payloadLoadFailed': 'VSIX payload yüklenemedi.',
+    'builder.themeOrPayloadNotFound': 'Tema veya payload bulunamadı.',
+    'builder.vsixBuildFailed': 'VSIX oluşturulamadı.',
+    'success.generatedFor': '{name} için paket başarıyla oluşturuldu.',
+    'about.liveBadge': 'Canlı İndeksleme: Aktif',
+    'about.heroSubtitle': 'Global VS Code ekosisteminde analiz edilen temalar. Hassas eşleşme için tüm renk anahtarlarını indeksliyoruz.',
+    'about.statExtensions': 'Eklenti',
+    'about.statColorKeys': 'Renk Anahtarı',
+    'about.statDailyUpdates': 'Günlük Güncelleme',
+    'about.statQueryTime': 'Sorgu Süresi',
+    'about.algorithmKicker': 'Algoritmik Çekirdek',
+    'about.algorithmTitle': 'HSL Renk Eşleştirme Motoru',
+    'about.algorithmBody': 'ThemeDatabase renkleri HSL uzayına çevirir ve algısal olarak daha doğru sonuçlar için Delta-E mesafesi hesaplar.',
+    'about.engineDeltaTitle': 'Delta-E Hesabı',
+    'about.engineDeltaBody': 'Güvenilir görsel benzerlik için CIE tabanlı renk uzaklığı eşleştirmesi.',
+    'about.enginePerceptualTitle': 'Algısal Tutarlılık',
+    'about.enginePerceptualBody': 'İnsan gözünün kontrast ve parlaklık algısını temel alır.',
+    'about.databaseKicker': 'Veritabanı',
+    'about.databaseTitle': 'Global İndeks',
+    'about.extensionsTracked': 'İzlenen Eklentiler',
+    'about.colorKeysTracked': 'Renk Anahtarları',
+    'about.performanceKicker': 'Performans Mimarisi',
+    'about.performanceTitle': 'Motoru Tanıyın',
+    'about.performanceBody': 'Statik shard yükleme ve sanallaştırılmış listeleme ile düşük gecikmeli gezinme.',
+    'about.perfClientTitle': 'İstemci Tarafı İşleme',
+    'about.perfClientBody': 'Backend gerektirmeden tamamen tarayıcıda çalışır.',
+    'about.perfShardTitle': 'Parçalı Veri Yükleme',
+    'about.perfShardBody': 'İlk render performansı için sadece gerekli parçaları yükler.',
+    'about.perfVirtualizedTitle': 'Sanallaştırılmış Listeler',
+    'about.perfVirtualizedBody': 'Büyük sonuç setlerinde kaydırma akıcı kalır.',
+    'about.licenseKicker': 'Açık Kaynak',
+    'about.licenseTitle': 'MIT Lisansı',
+    'about.licenseBody': 'Bu proje açık kullanım ve değişiklik için MIT Lisansı ile lisanslanmıştır.',
+    'about.licenseView': 'LICENSE Görüntüle',
+  },
+  de: { 'header.language': 'Sprache', 'home.resetFilters': 'Filter zurücksetzen', 'card.details': 'Details' },
+  fr: { 'header.language': 'Langue', 'home.resetFilters': 'Réinitialiser les filtres', 'card.details': 'Détails' },
+  zh: { 'header.language': '语言', 'home.resetFilters': '重置筛选', 'card.details': '详情' },
+  ja: { 'header.language': '言語', 'home.resetFilters': 'フィルターをリセット', 'card.details': '詳細' },
+  ko: { 'header.language': '언어', 'home.resetFilters': '필터 초기화', 'card.details': '상세' },
+  ar: {
+    'header.language': 'اللغة',
+    'home.resetFilters': 'إعادة ضبط الفلاتر',
+    'card.details': 'التفاصيل',
+    'app.skipToContent': 'تجاوز إلى المحتوى',
+  },
+  es: { 'header.language': 'Idioma', 'home.resetFilters': 'Restablecer filtros', 'card.details': 'Detalles' },
+  pt: { 'header.language': 'Idioma', 'home.resetFilters': 'Redefinir filtros', 'card.details': 'Detalhes' },
+  hi: { 'header.language': 'भाषा', 'home.resetFilters': 'फ़िल्टर रीसेट करें', 'card.details': 'विवरण' },
+};
+
+const I18nContext = createContext<I18nContextValue | null>(null);
+
+function interpolate(input: string, vars?: Record<string, string | number>): string {
+  if (!vars) {
+    return input;
+  }
+  return input.replace(/\{(\w+)\}/g, (_, key: string) => `${vars[key] ?? ''}`);
+}
+
+export function I18nProvider({ children }: PropsWithChildren) {
+  const [locale, setLocale] = useState<Locale>(() => {
+    const saved = localStorage.getItem('tdb-locale') as Locale | null;
+    if (saved && saved in LOCALE_LABELS) {
+      return saved;
+    }
+    return 'en';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('tdb-locale', locale);
+    document.documentElement.lang = locale;
+    document.documentElement.dir = RTL_LOCALES.includes(locale) ? 'rtl' : 'ltr';
+  }, [locale]);
+
+  const value = useMemo<I18nContextValue>(() => ({
+    locale,
+    setLocale,
+    t: (key, vars) => {
+      const fromLocale = MESSAGES[locale]?.[key];
+      const fallback = EN_MESSAGES[key];
+      const text = fromLocale ?? fallback ?? key;
+      return interpolate(text, vars);
+    },
+    formatNumber: (num) => num.toLocaleString(NUMBER_LOCALE[locale] ?? 'en-US'),
+  }), [locale]);
+
+  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
+}
+
+export function useI18n(): I18nContextValue {
+  const ctx = useContext(I18nContext);
+  if (!ctx) {
+    throw new Error('useI18n must be used inside I18nProvider');
+  }
+  return ctx;
+}
+
+export const LOCALE_OPTIONS = Object.entries(LOCALE_LABELS).map(([value, label]) => ({
+  value: value as Locale,
+  label,
+}));

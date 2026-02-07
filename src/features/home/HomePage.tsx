@@ -6,10 +6,12 @@ import { LoadingBar } from '@/components/LoadingBar';
 import { VirtualThemeCollection } from '@/components/VirtualThemeCollection';
 import { getIndexManifest, loadAllIndexRecords } from '@/lib/dataClient';
 import { applyThemeFilters } from '@/lib/filterThemes';
+import { useI18n } from '@/i18n';
 import { defaultFilters, readFiltersFromSearch, writeFiltersToSearch } from '@/lib/query';
 import type { ThemeFilters, ThemeIndexRecord } from '@/types/theme';
 
 export default function HomePage() {
+  const { t, formatNumber } = useI18n();
   const [searchParams, setSearchParams] = useSearchParams();
   const [filters, setFilters] = useState<ThemeFilters>(() => readFiltersFromSearch(searchParams));
   const [records, setRecords] = useState<ThemeIndexRecord[]>([]);
@@ -87,11 +89,11 @@ export default function HomePage() {
       ) : (
         <>
           <div className="results-info">
-            <h2>Theme Explorer</h2>
+            <h2>{t('home.explorer')}</h2>
             <p>
-              Filtre sonucu: <strong>{filtered.length.toLocaleString('tr-TR')}</strong> tema
+              {t('home.filterResult', { count: formatNumber(filtered.length) })}
             </p>
-            <button type="button" onClick={() => setFilters(defaultFilters)}>Filtreleri Sıfırla</button>
+            <button type="button" onClick={() => setFilters(defaultFilters)}>{t('home.resetFilters')}</button>
           </div>
           <VirtualThemeCollection items={filtered} view={filters.view} />
         </>

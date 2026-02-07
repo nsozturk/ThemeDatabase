@@ -2,9 +2,11 @@ import type { CSSProperties } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getThemeDetailRecordById, getThemeIndexRecordById } from '@/lib/dataClient';
+import { useI18n } from '@/i18n';
 import type { ThemeDetailRecord, ThemeIndexRecord } from '@/types/theme';
 
 export default function ThemeDetailPage() {
+  const { t } = useI18n();
   const { themeId = '' } = useParams();
   const [theme, setTheme] = useState<ThemeIndexRecord | null>(null);
   const [detail, setDetail] = useState<ThemeDetailRecord | null>(null);
@@ -40,14 +42,14 @@ export default function ThemeDetailPage() {
   }, [themeId]);
 
   if (loading) {
-    return <main className="tdb-container page-block">Tema detayı yükleniyor...</main>;
+    return <main className="tdb-container page-block">{t('detail.loading')}</main>;
   }
 
   if (!theme || !detail) {
     return (
       <main className="tdb-container page-block">
-        <p>Tema bulunamadı.</p>
-        <Link to="/">Listeye dön</Link>
+        <p>{t('detail.notFound')}</p>
+        <Link to="/">{t('detail.backToList')}</Link>
       </main>
     );
   }
@@ -60,8 +62,8 @@ export default function ThemeDetailPage() {
           <p>{theme.publisher} · {theme.extensionName}</p>
           <p>{detail.description || theme.description}</p>
           <div className="detail-actions">
-            <Link to={`/builder/${theme.id}`}>Export VSIX</Link>
-            <a href={theme.marketplaceUrl} target="_blank" rel="noreferrer">Marketplace</a>
+            <Link to={`/builder/${theme.id}`}>{t('detail.exportVsix')}</Link>
+            <a href={theme.marketplaceUrl} target="_blank" rel="noreferrer">{t('detail.marketplace')}</a>
           </div>
         </div>
         <div className="detail-preview">
@@ -81,7 +83,7 @@ export default function ThemeDetailPage() {
 
       <section className="detail-grid">
         <article>
-          <h2>Token Palette</h2>
+          <h2>{t('detail.tokenPalette')}</h2>
           <ul>
             {detail.tokenPalette.map((item) => (
               <li key={item.role}>
@@ -94,7 +96,7 @@ export default function ThemeDetailPage() {
         </article>
 
         <article>
-          <h2>Editor Colors</h2>
+          <h2>{t('detail.editorColors')}</h2>
           <ul>
             {Object.entries(detail.editorColors).map(([key, value]) => (
               <li key={key}>
@@ -108,7 +110,7 @@ export default function ThemeDetailPage() {
       </section>
 
       <section>
-        <h2>Benzer Temalar</h2>
+        <h2>{t('detail.similarThemes')}</h2>
         <div className="similar-links">
           {detail.similarThemeIds.slice(0, 8).map((id) => (
             <Link key={id} to={`/themes/${id}`}>{id}</Link>

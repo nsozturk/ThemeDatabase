@@ -61,6 +61,10 @@ npm run smoke
 
 GitHub Actions workflow publishes `dist/` to GitHub Pages. Ensure generated `public/data` and preview assets are present before pushing.
 
+## License
+
+MIT (`LICENSE`)
+
 ## SEO Notes
 
 - SEO tags are defined in `index.html` (description, keywords, Open Graph, Twitter, JSON-LD).

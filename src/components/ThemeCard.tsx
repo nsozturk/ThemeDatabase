@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, type KeyboardEvent, type MouseEvent } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import type { ThemeIndexRecord } from '@/types/theme';
 
 interface ThemeCardProps {
@@ -36,8 +36,43 @@ function Preview({ theme }: { theme: ThemeIndexRecord }) {
 }
 
 export function ThemeCard({ theme, view }: ThemeCardProps) {
+  const navigate = useNavigate();
+
+  const goToDetail = (): void => {
+    navigate(`/themes/${theme.id}`);
+  };
+
+  const ignoreCardNavigation = (target: EventTarget | null): boolean => {
+    const element = target as HTMLElement | null;
+    return Boolean(element?.closest('a, button, input, select, textarea'));
+  };
+
+  const onCardClick = (event: MouseEvent<HTMLElement>): void => {
+    if (ignoreCardNavigation(event.target)) {
+      return;
+    }
+    goToDetail();
+  };
+
+  const onCardKeyDown = (event: KeyboardEvent<HTMLElement>): void => {
+    if (ignoreCardNavigation(event.target)) {
+      return;
+    }
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      goToDetail();
+    }
+  };
+
   return (
-    <article className={`theme-card ${view}`}>
+    <article
+      className={`theme-card is-clickable ${view}`}
+      role="link"
+      tabIndex={0}
+      aria-label={`${theme.themeDisplayName} detay sayfasını aç`}
+      onClick={onCardClick}
+      onKeyDown={onCardKeyDown}
+    >
       <div className="preview-wrap">
         <Preview key={theme.id} theme={theme} />
       </div>

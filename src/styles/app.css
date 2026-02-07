@@ -827,6 +827,25 @@ a:focus-visible {
   min-height: 100%;
 }
 
+.detail-v2-preview-fallback .preview-fallback-overlay {
+  inset: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.detail-v2-preview-fallback .preview-fallback-overlay span {
+  font-size: 0.82rem;
+  padding: 0.3rem 0.72rem;
+  border-color: rgba(168, 85, 247, 0.55);
+  box-shadow:
+    0 0 18px rgba(168, 85, 247, 0.22),
+    0 0 26px rgba(74, 136, 255, 0.14);
+}
+
 .theme-meta {
   padding: 0.65rem 0.75rem;
   display: flex;

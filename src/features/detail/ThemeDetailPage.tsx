@@ -18,6 +18,8 @@ export default function ThemeDetailPage() {
   const [theme, setTheme] = useState<ThemeIndexRecord | null>(null);
   const [detail, setDetail] = useState<ThemeDetailRecord | null>(null);
   const [loading, setLoading] = useState(true);
+  const [previewSrc, setPreviewSrc] = useState('');
+  const [previewFailed, setPreviewFailed] = useState(false);
 
   useEffect(() => {
     let canceled = false;
@@ -32,6 +34,9 @@ export default function ThemeDetailPage() {
       if (!canceled) {
         setTheme(indexRecord);
         setDetail(detailRecord);
+        const initial = indexRecord?.previewSvg ?? indexRecord?.previewPng ?? '';
+        setPreviewSrc(initial);
+        setPreviewFailed(!initial);
         setLoading(false);
       }
     }
@@ -91,16 +96,29 @@ export default function ThemeDetailPage() {
           </header>
 
           <div className="detail-v2-preview-frame">
-            {theme.previewSvg || theme.previewPng ? (
+            {!previewFailed && previewSrc ? (
               <img
-                src={theme.previewSvg ?? theme.previewPng}
+                key={theme.id}
+                src={previewSrc}
                 alt={`${theme.themeDisplayName} preview`}
                 width={960}
                 height={600}
                 loading="lazy"
+                onError={() => {
+                  if (theme.previewPng && previewSrc !== theme.previewPng) {
+                    setPreviewSrc(theme.previewPng);
+                    return;
+                  }
+                  setPreviewFailed(true);
+                }}
               />
             ) : (
-              <div style={{ background: theme.bg }} />
+              <div className="detail-v2-preview-fallback preview-fallback" style={{ background: theme.bg }}>
+                <div className="preview-fallback-skeleton" aria-hidden="true" />
+                <div className="preview-fallback-overlay">
+                  <span>{t('card.previewUnavailable')}</span>
+                </div>
+              </div>
             )}
           </div>
 

@@ -8,13 +8,20 @@ interface ThemeCardProps {
   view: 'grid' | 'list';
 }
 
-function Preview({ theme }: { theme: ThemeIndexRecord }) {
+function Preview({ theme, unavailableLabel }: { theme: ThemeIndexRecord; unavailableLabel: string }) {
   const initial = theme.previewSvg ?? theme.previewPng ?? '';
   const [currentSrc, setCurrentSrc] = useState(initial);
   const [failed, setFailed] = useState(!initial);
 
   if (failed) {
-    return <div className="preview-fallback" style={{ background: theme.bg }} />;
+    return (
+      <div className="preview-fallback" style={{ background: theme.bg }}>
+        <div className="preview-fallback-skeleton" aria-hidden="true" />
+        <div className="preview-fallback-overlay">
+          <span>{unavailableLabel}</span>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -76,7 +83,7 @@ export function ThemeCard({ theme, view }: ThemeCardProps) {
       onKeyDown={onCardKeyDown}
     >
       <div className="preview-wrap">
-        <Preview key={theme.id} theme={theme} />
+        <Preview key={theme.id} theme={theme} unavailableLabel={t('card.previewUnavailable')} />
       </div>
       <div className="theme-meta">
         <h3>{theme.themeDisplayName}</h3>

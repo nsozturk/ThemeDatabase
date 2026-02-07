@@ -58,8 +58,10 @@ describe('vsix builder', () => {
     expect(artifact.blob.size).toBeGreaterThan(0);
 
     const zip = await JSZip.loadAsync(artifact.blob);
-    const pkg = await zip.file('package.json')?.async('string');
+    const pkg = await zip.file('extension/package.json')?.async('string');
     expect(pkg).toContain('darcula-pack');
-    expect(zip.file('themes/darcula-pack.json')).toBeTruthy();
+    expect(zip.file('extension/themes/darcula-pack.json')).toBeTruthy();
+    expect(zip.file('extension.vsixmanifest')).toBeTruthy();
+    expect(zip.file('[Content_Types].xml')).toBeTruthy();
   });
 });

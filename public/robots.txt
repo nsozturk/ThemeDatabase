@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ns0bj.github.io/ThemeDatabase/sitemap.xml
+

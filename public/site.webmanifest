@@ -1,0 +1,20 @@
+{
+  "name": "ThemeDatabase",
+  "short_name": "ThemeDB",
+  "description": "VS Code temalarını keşfet, filtrele ve VSIX üret.",
+  "lang": "tr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#1e1f22",
+  "theme_color": "#1e1f22",
+  "icons": [
+    {
+      "src": "./vite.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
+

@@ -60,3 +60,12 @@ npm run smoke
 ## Deploy
 
 GitHub Actions workflow publishes `dist/` to GitHub Pages. Ensure generated `public/data` and preview assets are present before pushing.
+
+## SEO Notes
+
+- SEO tags are defined in `index.html` (description, keywords, Open Graph, Twitter, JSON-LD).
+- `public/robots.txt` and `public/sitemap.xml` are included for GitHub Pages indexing.
+- If your GitHub Pages URL differs from `https://ns0bj.github.io/ThemeDatabase/`, update:
+  - `index.html` canonical + `og:url` + `og:image`
+  - `public/robots.txt` sitemap URL
+  - `public/sitemap.xml` `<loc>`

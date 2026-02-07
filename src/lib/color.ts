@@ -30,6 +30,34 @@ function hexToRgb(hex: string): { r: number; g: number; b: number } {
   };
 }
 
+function rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: number } {
+  const rn = r / 255;
+  const gn = g / 255;
+  const bn = b / 255;
+  const max = Math.max(rn, gn, bn);
+  const min = Math.min(rn, gn, bn);
+  const delta = max - min;
+
+  let h = 0;
+  if (delta !== 0) {
+    if (max === rn) {
+      h = ((gn - bn) / delta) % 6;
+    } else if (max === gn) {
+      h = ((bn - rn) / delta) + 2;
+    } else {
+      h = ((rn - gn) / delta) + 4;
+    }
+    h *= 60;
+    if (h < 0) {
+      h += 360;
+    }
+  }
+
+  const l = (max + min) / 2;
+  const s = delta === 0 ? 0 : delta / (1 - Math.abs((2 * l) - 1));
+  return { h, s, l };
+}
+
 function pivotRgb(v: number): number {
   const c = v / 255;
   return c > 0.04045 ? ((c + 0.055) / 1.055) ** 2.4 : c / 12.92;
@@ -68,7 +96,7 @@ export function deltaE(a: [number, number, number], b: [number, number, number])
 
 export function toleranceToDelta(tolerance: number): number {
   const clamped = Math.max(0, Math.min(100, tolerance));
-  return (clamped / 100) * 120;
+  return ((clamped / 100) ** 1.25) * 65;
 }
 
 export function syntaxColorForRole(summary: SyntaxSummary, role: string): string | null {
@@ -77,6 +105,50 @@ export function syntaxColorForRole(summary: SyntaxSummary, role: string): string
     return entry?.hex ?? null;
   }
   return summary[role as keyof SyntaxSummary]?.hex ?? null;
+}
+
+function hueDistance(a: number, b: number): number {
+  const raw = Math.abs(a - b);
+  return Math.min(raw, 360 - raw);
+}
+
+function canPassSaturationGuard(targetHex: string, candidateHex: string, tolerance: number): boolean {
+  const clamped = Math.max(0, Math.min(100, tolerance));
+  const targetRgb = hexToRgb(targetHex);
+  const candidateRgb = hexToRgb(candidateHex);
+  const target = rgbToHsl(targetRgb.r, targetRgb.g, targetRgb.b);
+  const candidate = rgbToHsl(candidateRgb.r, candidateRgb.g, candidateRgb.b);
+
+  // Avoid gray-ish matches when user selected a vivid color.
+  if (target.s >= 0.28 && candidate.s <= 0.16) {
+    return false;
+  }
+
+  // Keep hue reasonably aligned for saturated colors.
+  if (target.s >= 0.28 && candidate.s >= 0.2) {
+    const maxHueDrift = 10 + (clamped / 100) * 58;
+    if (hueDistance(target.h, candidate.h) > maxHueDrift) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function candidateHexesForRole(record: ThemeIndexRecord, role: string): string[] {
+  if (role === 'background') {
+    return [record.bg];
+  }
+
+  if (role === 'any') {
+    const syntax = Object.values(record.syntaxSummary)
+      .map((entry) => entry?.hex)
+      .filter((hex): hex is string => Boolean(hex));
+    return [...syntax, record.bg];
+  }
+
+  const syntaxHex = syntaxColorForRole(record.syntaxSummary, role);
+  return syntaxHex ? [syntaxHex] : [];
 }
 
 export function recordMatchesColor(
@@ -92,21 +164,18 @@ export function recordMatchesColor(
 
   const targetLab = hexToLab(normalizedTarget);
   const maxDistance = toleranceToDelta(tolerance);
+  const checks = candidateHexesForRole(record, role);
 
-  const checks: string[] = [];
-  if (role === 'background') {
-    checks.push(record.bg);
-  } else {
-    checks.push(record.bg);
-    const syntaxHex = syntaxColorForRole(record.syntaxSummary, role);
-    if (syntaxHex) {
-      checks.push(syntaxHex);
-    }
+  if (checks.length === 0) {
+    return false;
   }
 
   return checks.some((hex) => {
     const normalized = normalizeHex(hex);
     if (!normalized) {
+      return false;
+    }
+    if (!canPassSaturationGuard(normalizedTarget, normalized, tolerance)) {
       return false;
     }
     return deltaE(targetLab, hexToLab(normalized)) <= maxDistance;

@@ -17,10 +17,6 @@ export function Header() {
         <nav className="tdb-nav" aria-label={t('header.navMain')}>
           <Link to="/">{t('header.navThemes')}</Link>
           <span aria-hidden="true">•</span>
-          <span className="muted">{t('header.navCommunity')}</span>
-          <span aria-hidden="true">•</span>
-          <span className="muted">{t('header.navDocs')}</span>
-          <span aria-hidden="true">•</span>
           <Link to="/about">{t('header.navAbout')}</Link>
           <label className="tdb-lang-switch">
             <span>{t('header.language')}</span>

@@ -1,7 +1,28 @@
 import { useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { useI18n } from '@/i18n';
 
-const palettePreview = ['#2d2d2d', '#1e1e1e', '#000000', '#f8f8f8', '#333333', '#22212c', '#282a36', '#191622', '#263238', '#292d3e', '#23241f', '#fefefe'];
+const databaseSnapshot = {
+  themesIndexed: 22037,
+  extensionsTracked: 14063,
+  publishersTracked: 11970,
+  colorKeysTracked: 27535,
+};
+
+const palettePreview = [
+  { hex: '#000000', count: 1496 },
+  { hex: '#ffffff', count: 1206 },
+  { hex: '#1e1e1e', count: 953 },
+  { hex: '#272c33', count: 380 },
+  { hex: '#1f1f1e', count: 285 },
+  { hex: '#202121', count: 198 },
+  { hex: '#212222', count: 197 },
+  { hex: '#191a19', count: 190 },
+  { hex: '#263238', count: 183 },
+  { hex: '#171817', count: 183 },
+  { hex: '#111010', count: 171 },
+  { hex: '#090a0a', count: 159 },
+];
 
 export default function AboutPage() {
   const { t, formatNumber } = useI18n();
@@ -52,8 +73,6 @@ export default function AboutPage() {
     ],
     [t],
   );
-
-  const licenseHref = `${import.meta.env.BASE_URL}LICENSE`;
 
   return (
     <main className="tdb-container page-block about-v2-page">
@@ -112,24 +131,28 @@ export default function AboutPage() {
           </div>
           <div className="about-v2-database-metrics">
             <div>
-              <strong>{formatNumber(14203)}</strong>
+              <strong>{formatNumber(databaseSnapshot.extensionsTracked)}</strong>
               <span>{t('about.extensionsTracked')}</span>
             </div>
             <div>
-              <strong>{formatNumber(3129)}</strong>
+              <strong>{formatNumber(databaseSnapshot.colorKeysTracked)}</strong>
               <span>{t('about.colorKeysTracked')}</span>
             </div>
           </div>
         </div>
 
         <div className="about-v2-color-grid">
-          {palettePreview.map((hex) => (
-            <article key={hex}>
-              <span className="material-symbols-outlined" aria-hidden="true">dataset</span>
-              <small>{hex}</small>
+          {palettePreview.map((item) => (
+            <article key={item.hex}>
+              <span className="about-v2-color-swatch" style={{ background: item.hex }} aria-hidden="true" />
+              <strong>{item.hex}</strong>
+              <small>{formatNumber(item.count)} / {formatNumber(databaseSnapshot.themesIndexed)}</small>
             </article>
           ))}
         </div>
+        <p className="about-v2-database-note">
+          {formatNumber(databaseSnapshot.themesIndexed)} indexed themes across {formatNumber(databaseSnapshot.publishersTracked)} publishers.
+        </p>
       </section>
 
       <section className="about-v2-engine">
@@ -158,7 +181,7 @@ export default function AboutPage() {
         </div>
         <div className="about-v2-license-actions">
           <span>{t('about.licenseBadge')}</span>
-          <a href={licenseHref} target="_blank" rel="noreferrer">{t('about.licenseView')}</a>
+          <Link to="/license">{t('about.licenseView')}</Link>
         </div>
       </section>
     </main>

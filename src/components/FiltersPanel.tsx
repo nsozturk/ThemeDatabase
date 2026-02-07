@@ -26,47 +26,35 @@ const bgOptions = ['all', 'dark', 'light', 'blue', 'purple', 'green', 'orange', 
 
 const presetColorGroups: Array<{ categoryKey: string; colors: Array<{ label: string; hex: string }> }> = [
   {
-    categoryKey: 'filters.palette.core',
-    colors: [
-      { label: 'Background', hex: '#2b2d30' },
-      { label: 'Keyword', hex: '#cc7832' },
-      { label: 'Function', hex: '#ffc66d' },
-      { label: 'String', hex: '#6a8759' },
-      { label: 'Comment', hex: '#808080' },
-      { label: 'Number', hex: '#6897bb' },
-    ],
-  },
-  {
     categoryKey: 'filters.palette.warm',
     colors: [
-      { label: 'Amber', hex: '#ffb347' },
-      { label: 'Coral', hex: '#ff7661' },
-      { label: 'Rose', hex: '#ff5f8f' },
-      { label: 'Brick', hex: '#c25b56' },
-      { label: 'Gold', hex: '#d6b54b' },
-      { label: 'Copper', hex: '#b87333' },
+      { label: 'Red', hex: '#ef4444' },
+      { label: 'Orange', hex: '#f97316' },
+      { label: 'Yellow', hex: '#eab308' },
     ],
   },
   {
     categoryKey: 'filters.palette.cool',
     colors: [
-      { label: 'Ocean', hex: '#4a88ff' },
-      { label: 'Cyan', hex: '#48c9d6' },
-      { label: 'Mint', hex: '#58d6a2' },
-      { label: 'Teal', hex: '#2ca58d' },
-      { label: 'Violet', hex: '#9876aa' },
-      { label: 'Indigo', hex: '#5b6ee1' },
+      { label: 'Green', hex: '#22c55e' },
+      { label: 'Teal', hex: '#14b8a6' },
+      { label: 'Cyan', hex: '#06b6d4' },
+    ],
+  },
+  {
+    categoryKey: 'filters.palette.deep',
+    colors: [
+      { label: 'Blue', hex: '#3b82f6' },
+      { label: 'Indigo', hex: '#6366f1' },
+      { label: 'Purple', hex: '#a855f7' },
     ],
   },
   {
     categoryKey: 'filters.palette.neutral',
     colors: [
-      { label: 'Snow', hex: '#f5f7fa' },
-      { label: 'Cloud', hex: '#c9d1d9' },
-      { label: 'Slate', hex: '#7a869a' },
-      { label: 'Steel', hex: '#5b6575' },
-      { label: 'Graphite', hex: '#3b4048' },
-      { label: 'Black', hex: '#111315' },
+      { label: 'Pink', hex: '#ec4899' },
+      { label: 'Slate', hex: '#64748b' },
+      { label: 'Black', hex: '#111827' },
     ],
   },
 ];

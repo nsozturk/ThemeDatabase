@@ -26,6 +26,7 @@ const sample: ThemeIndexRecord[] = [
     syntaxSummary: {
       keyword: { hex: '#cc7832', category: 'orange' },
       string: { hex: '#6a8759', category: 'green' },
+      comment: { hex: '#22c55e', category: 'green' },
     },
     previewSvg: 'previews/a.svg',
     marketplaceUrl: 'https://example.com',
@@ -39,14 +40,35 @@ const sample: ThemeIndexRecord[] = [
     publisher: 'Beta',
     themeInternalName: 'light',
     themeDisplayName: 'Light Fresh',
+    description: 'Green background with muted comments',
+    bg: '#22c55e',
+    badge: '#7a7a7a',
+    bgCategory: 'green',
+    syntaxSummary: {
+      keyword: { hex: '#005cc5', category: 'blue' },
+      comment: { hex: '#808080', category: 'gray' },
+    },
+    previewSvg: 'previews/b.svg',
+    marketplaceUrl: 'https://example.com',
+    themeUrl: 'https://example.com',
+    labVectors: [0, 0, 0],
+  },
+  {
+    id: 'c',
+    extensionId: 'publisher.c',
+    extensionName: 'C Theme Pack',
+    publisher: 'Gamma',
+    themeInternalName: 'light',
+    themeDisplayName: 'Light Fresh',
     description: 'Light coding theme',
     bg: '#f5f5f5',
     badge: '#7a7a7a',
     bgCategory: 'light',
     syntaxSummary: {
       keyword: { hex: '#005cc5', category: 'blue' },
+      comment: { hex: '#9ca3af', category: 'gray' },
     },
-    previewSvg: 'previews/b.svg',
+    previewSvg: 'previews/c.svg',
     marketplaceUrl: 'https://example.com',
     themeUrl: 'https://example.com',
     labVectors: [0, 0, 0],
@@ -63,7 +85,7 @@ describe('applyThemeFilters', () => {
   it('filters by background category', () => {
     const result = applyThemeFilters(sample, { ...baseFilters, bg: 'light' });
     expect(result).toHaveLength(1);
-    expect(result[0]?.id).toBe('b');
+    expect(result[0]?.id).toBe('c');
   });
 
   it('filters by token color similarity', () => {
@@ -72,6 +94,18 @@ describe('applyThemeFilters', () => {
       token: 'keyword',
       hex: '#cc7832',
       tolerance: 1,
+    });
+
+    expect(result).toHaveLength(1);
+    expect(result[0]?.id).toBe('a');
+  });
+
+  it('keeps strict token matching for comment filters', () => {
+    const result = applyThemeFilters(sample, {
+      ...baseFilters,
+      token: 'comment',
+      hex: '#22c55e',
+      tolerance: 45,
     });
 
     expect(result).toHaveLength(1);

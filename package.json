@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build:app": "tsc -b && vite build",
-    "build": "npm run build:app && (cp public/.nojekyll dist/.nojekyll || true)",
+    "build": "npm run build:app && (cp public/.nojekyll dist/.nojekyll || true) && (cp LICENSE dist/LICENSE || true)",
     "build:data": "tsx scripts/build-all.ts",
     "sync:previews": "bash scripts/sync-previews.sh",
     "build:full": "npm run build:data && npm run sync:previews && npm run build",

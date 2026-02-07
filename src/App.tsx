@@ -5,6 +5,7 @@ import { useI18n } from '@/i18n';
 
 const HomePage = lazy(() => import('@/features/home/HomePage'));
 const AboutPage = lazy(() => import('@/features/about/AboutPage'));
+const LicensePage = lazy(() => import('@/features/license/LicensePage'));
 const ThemeDetailPage = lazy(() => import('@/features/detail/ThemeDetailPage'));
 const BuilderPage = lazy(() => import('@/features/builder/BuilderPage'));
 const SuccessPage = lazy(() => import('@/features/success/SuccessPage'));
@@ -22,6 +23,7 @@ export default function App() {
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/about" element={<AboutPage />} />
+              <Route path="/license" element={<LicensePage />} />
               <Route path="/themes/:themeId" element={<ThemeDetailPage />} />
               <Route path="/builder/:themeId" element={<BuilderPage />} />
               <Route path="/vsix/success" element={<SuccessPage />} />

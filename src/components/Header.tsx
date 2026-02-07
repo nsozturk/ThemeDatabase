@@ -14,6 +14,7 @@ export function Header() {
             <small>{t('header.brandSubtitle')}</small>
           </div>
         </Link>
+        <p className="tdb-header-motto">{t('header.motto')}</p>
         <nav className="tdb-nav" aria-label={t('header.navMain')}>
           <Link to="/">{t('header.navThemes')}</Link>
           <span aria-hidden="true">•</span>

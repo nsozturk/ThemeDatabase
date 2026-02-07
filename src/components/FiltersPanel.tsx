@@ -113,7 +113,7 @@ export function FiltersPanel({ filters, total, filtered, onChange }: FiltersPane
 
   return (
     <section className="filters-panel" aria-label={t('filters.ariaLabel')}>
-      <div className="search-col">
+      <div className="search-col filter-field">
         <label htmlFor="theme-search">{t('filters.search')}</label>
         <input
           id="theme-search"
@@ -125,7 +125,7 @@ export function FiltersPanel({ filters, total, filtered, onChange }: FiltersPane
         />
       </div>
 
-      <div>
+      <div className="filter-field">
         <label htmlFor="bg-filter">{t('filters.bgCategory')}</label>
         <select
           id="bg-filter"
@@ -138,7 +138,7 @@ export function FiltersPanel({ filters, total, filtered, onChange }: FiltersPane
         </select>
       </div>
 
-      <div>
+      <div className="filter-field">
         <label htmlFor="token-filter">{t('filters.tokenRole')}</label>
         <select
           id="token-filter"
@@ -151,7 +151,7 @@ export function FiltersPanel({ filters, total, filtered, onChange }: FiltersPane
         </select>
       </div>
 
-      <div>
+      <div className="filter-field">
         <label htmlFor="hex-filter">{t('filters.hex')}</label>
         <div className="hex-filter-wrap" ref={paletteRef}>
           <button
@@ -216,7 +216,7 @@ export function FiltersPanel({ filters, total, filtered, onChange }: FiltersPane
         </div>
       </div>
 
-      <div>
+      <div className="filter-field">
         <label htmlFor="tolerance-filter">{t('filters.tolerance', { value: filters.tolerance })}</label>
         <input
           id="tolerance-filter"
@@ -229,7 +229,7 @@ export function FiltersPanel({ filters, total, filtered, onChange }: FiltersPane
         />
       </div>
 
-      <div>
+      <div className="filter-field">
         <label htmlFor="sort-filter">{t('filters.sort')}</label>
         <select
           id="sort-filter"
@@ -242,7 +242,7 @@ export function FiltersPanel({ filters, total, filtered, onChange }: FiltersPane
         </select>
       </div>
 
-      <div>
+      <div className="filter-field">
         <label htmlFor="view-filter">{t('filters.view')}</label>
         <select
           id="view-filter"

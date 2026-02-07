@@ -27,7 +27,6 @@ const roleOrder: PickableRole[] = [
   'string',
   'comment',
   'number',
-  'type',
   'variable',
   'operator',
 ];
@@ -65,6 +64,52 @@ function t(text: string, role?: PickableRole): SnippetToken {
   return role ? { text, role } : { text };
 }
 
+const fallbackSampleByRole: Record<PickableRole, string> = {
+  background: '#2b2d30',
+  keyword: 'const',
+  function: 'loadThemeShards',
+  string: '"darcula"',
+  comment: '// Build VSIX for darcula-compatible themes',
+  number: '5000',
+  variable: 'dataset',
+  operator: '=',
+  type: 'ThemeRecord',
+};
+
+const sampleFileByLanguage: Record<string, string> = {
+  javascript: 'index.js',
+  typescript: 'index.ts',
+  python: 'main.py',
+  java: 'Main.java',
+  csharp: 'Program.cs',
+  cpp: 'main.cpp',
+  c: 'main.c',
+  go: 'main.go',
+  rust: 'main.rs',
+  php: 'index.php',
+  ruby: 'main.rb',
+  swift: 'main.swift',
+  kotlin: 'Main.kt',
+  dart: 'main.dart',
+  scala: 'Main.scala',
+  r: 'main.R',
+  sql: 'query.sql',
+  bash: 'main.sh',
+  powershell: 'main.ps1',
+  lua: 'main.lua',
+};
+
+function compactSample(text: string): string {
+  return text.replace(/\s+/g, ' ').trim();
+}
+
+function displaySample(role: PickableRole, sample: string): string {
+  if (role === 'comment' && sample.length > 42) {
+    return `${sample.slice(0, 39)}...`;
+  }
+  return sample;
+}
+
 function deriveSwatches(lines: SnippetToken[][]): SwatchToken[] {
   const firstByRole = new Map<PickableRole, string>();
 
@@ -74,7 +119,7 @@ function deriveSwatches(lines: SnippetToken[][]): SwatchToken[] {
         continue;
       }
       if (!firstByRole.has(token.role)) {
-        const compact = token.text.replace(/\s+/g, ' ').trim();
+        const compact = compactSample(token.text);
         if (compact) {
           firstByRole.set(token.role, compact);
         }
@@ -83,11 +128,12 @@ function deriveSwatches(lines: SnippetToken[][]): SwatchToken[] {
   }
 
   return roleOrder
-    .filter((role) => role === 'background' || firstByRole.has(role))
     .map((role) => ({
       role,
       label: roleLabels[role],
-      sample: role === 'background' ? darculaPalette.background : (firstByRole.get(role) ?? darculaPalette[role]),
+      sample: role === 'background'
+        ? darculaPalette.background
+        : (firstByRole.get(role) ?? fallbackSampleByRole[role]),
     }));
 }
 
@@ -396,10 +442,12 @@ export function HeroCodePicker({ onPick }: HeroCodePickerProps) {
     return null;
   }
 
+  const activeFileName = sampleFileByLanguage[activeSnippet.id] ?? 'main.txt';
+
   return (
     <section className="hero-picker" aria-label="Interactive Darcula code preview">
-      <div className="hero-header">
-        <div className="hero-header-copy">
+      <div className="hero-top">
+        <div className="hero-copy">
           <h1>{i18n('hero.title')}</h1>
           <p>{i18n('hero.subtitle')}</p>
         </div>
@@ -415,49 +463,61 @@ export function HeroCodePicker({ onPick }: HeroCodePickerProps) {
           </select>
         </label>
       </div>
-      <div className="hero-code-wrap" role="group" aria-label="Color pickable code sample">
-        <pre>
-          <code>
-            {activeSnippet.lines.map((line, lineIndex) => (
-              <span key={`${activeSnippet.id}-${lineIndex}`} className="line">
-                {line.map((token, tokenIndex) => {
-                  if (token.role) {
-                    const role = token.role;
-                    return (
-                      <button
-                        key={`${activeSnippet.id}-${lineIndex}-${tokenIndex}`}
-                        type="button"
-                        style={{ color: darculaPalette[role] }}
-                        onClick={() => onPick(role, darculaPalette[role])}
-                      >
-                        {token.text}
-                      </button>
-                    );
-                  }
+      <div className="hero-editor" role="group" aria-label="Color pickable code sample">
+        <div className="hero-editor-head">
+          <div className="hero-editor-lights" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </div>
+          <span className="hero-editor-file">{activeFileName}</span>
+        </div>
+        <div className="hero-editor-body">
+          <pre>
+            <code>
+              {activeSnippet.lines.map((line, lineIndex) => (
+                <span key={`${activeSnippet.id}-${lineIndex}`} className="hero-line">
+                  {line.map((token, tokenIndex) => {
+                    if (token.role) {
+                      const role = token.role;
+                      return (
+                        <button
+                          key={`${activeSnippet.id}-${lineIndex}-${tokenIndex}`}
+                          type="button"
+                          style={{ color: darculaPalette[role] }}
+                          onClick={() => onPick(role, darculaPalette[role])}
+                        >
+                          {token.text}
+                        </button>
+                      );
+                    }
 
-                  return (
-                    <span key={`${activeSnippet.id}-${lineIndex}-${tokenIndex}`} style={{ color: darculaPalette.variable }}>
-                      {token.text}
-                    </span>
-                  );
-                })}
-              </span>
-            ))}
-          </code>
-        </pre>
+                    return (
+                      <span key={`${activeSnippet.id}-${lineIndex}-${tokenIndex}`} style={{ color: darculaPalette.variable }}>
+                        {token.text}
+                      </span>
+                    );
+                  })}
+                </span>
+              ))}
+            </code>
+          </pre>
+        </div>
       </div>
-      <div className="hero-swatches">
+      <div className="hero-token-grid">
         {swatches.map((token) => (
           <button
             key={`${activeSnippet.id}-${token.role}`}
-            className="swatch"
+            className="hero-token-card"
             onClick={() => onPick(token.role, darculaPalette[token.role])}
-            style={{ '--swatch-color': darculaPalette[token.role] } as CSSProperties}
+            style={{ '--chip-color': darculaPalette[token.role] } as CSSProperties}
             title={`${token.label} ${darculaPalette[token.role]}`}
           >
-            <span className="dot" />
-            <span>{token.label}</span>
-            <code>{token.sample}</code>
+            <span className="hero-token-main">
+              <span className="hero-token-dot" />
+              <span>{token.label}</span>
+            </span>
+            <code>{displaySample(token.role, token.sample)}</code>
           </button>
         ))}
       </div>

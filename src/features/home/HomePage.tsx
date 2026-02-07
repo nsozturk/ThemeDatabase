@@ -89,10 +89,12 @@ export default function HomePage() {
       ) : (
         <>
           <div className="results-info">
-            <h2>{t('home.explorer')}</h2>
-            <p>
-              {t('home.filterResult', { count: formatNumber(filtered.length) })}
-            </p>
+            <div className="results-copy">
+              <h2>{t('home.explorer')}</h2>
+              <p>
+                {t('home.filterResult', { count: formatNumber(filtered.length) })}
+              </p>
+            </div>
             <button type="button" onClick={() => setFilters(defaultFilters)}>{t('home.resetFilters')}</button>
           </div>
           <VirtualThemeCollection items={filtered} view={filters.view} />

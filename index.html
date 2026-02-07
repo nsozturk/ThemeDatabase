@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="tr">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="./vite.svg" />
@@ -7,25 +7,25 @@
     <link rel="manifest" href="./site.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#1e1f22" />
-    <meta name="description" content="ThemeDatabase: VS Code temalarını keşfet, renge göre filtrele, detayları incele ve VSIX olarak indir." />
-    <meta name="keywords" content="VS Code theme database, vscode themes, color filter, VSIX builder, darcula, tema veritabanı, vscode tema, renk filtreleme" />
+    <meta name="description" content="ThemeDatabase is a global VS Code theme explorer: pick any color from code, filter 22K+ themes, and export selections as a VSIX." />
+    <meta name="keywords" content="VS Code theme database, vscode themes, theme explorer, color filter, token filter, VSIX builder, darcula, dracula, syntax highlighting themes" />
     <meta name="author" content="ns0bj" />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-    <link rel="canonical" href="https://ns0bj.github.io/ThemeDatabase/" />
+    <link rel="canonical" href="https://nsozturk.github.io/ThemeDatabase/" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="ThemeDatabase" />
     <meta property="og:title" content="ThemeDatabase · Global Theme Explorer" />
-    <meta property="og:description" content="VS Code temalarını keşfet, kod renklerini seçerek filtrele ve VSIX olarak indir." />
-    <meta property="og:url" content="https://ns0bj.github.io/ThemeDatabase/" />
-    <meta property="og:image" content="https://ns0bj.github.io/ThemeDatabase/vite.svg" />
-    <meta property="og:locale" content="tr_TR" />
+    <meta property="og:description" content="Pick any color from code and filter across the entire theme database. Export any theme as a VSIX." />
+    <meta property="og:url" content="https://nsozturk.github.io/ThemeDatabase/" />
+    <meta property="og:image" content="https://nsozturk.github.io/ThemeDatabase/og.png" />
+    <meta property="og:locale" content="en_US" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="ThemeDatabase · Global Theme Explorer" />
-    <meta name="twitter:description" content="VS Code temalarını renk bazlı filtreleyip VSIX paketine dönüştür." />
-    <meta name="twitter:image" content="https://ns0bj.github.io/ThemeDatabase/vite.svg" />
+    <meta name="twitter:description" content="Pick colors from code, filter 22K+ VS Code themes, and generate a VSIX extension package in the browser." />
+    <meta name="twitter:image" content="https://nsozturk.github.io/ThemeDatabase/og.png" />
 
     <script type="application/ld+json">
       {
@@ -34,16 +34,16 @@
           {
             "@type": "WebSite",
             "name": "ThemeDatabase",
-            "url": "https://ns0bj.github.io/ThemeDatabase/",
-            "description": "VS Code tema keşif ve VSIX üretim platformu."
+            "url": "https://nsozturk.github.io/ThemeDatabase/",
+            "description": "Global VS Code theme explorer with color/token filtering and browser-side VSIX export."
           },
           {
             "@type": "SoftwareApplication",
             "name": "ThemeDatabase",
             "applicationCategory": "DeveloperApplication",
             "operatingSystem": "Web",
-            "url": "https://ns0bj.github.io/ThemeDatabase/",
-            "description": "Renk ve token bazlı VS Code tema arama, detay inceleme ve VSIX üretimi."
+            "url": "https://nsozturk.github.io/ThemeDatabase/",
+            "description": "Search VS Code themes by syntax color intent, preview details, and export VSIX packages in the browser."
           }
         ]
       }
@@ -54,8 +54,16 @@
         const cleanUrl = window.location.href.split('#')[0];
         const canonical = document.querySelector('link[rel="canonical"]');
         const ogUrl = document.querySelector('meta[property="og:url"]');
+        const ogImage = document.querySelector('meta[property="og:image"]');
+        const twImage = document.querySelector('meta[name="twitter:image"]');
         if (canonical) canonical.setAttribute('href', cleanUrl);
         if (ogUrl) ogUrl.setAttribute('content', cleanUrl);
+        // Best-effort for deployments where the base URL differs.
+        // Note: some crawlers don't execute JS; keep static values above sane.
+        const base = cleanUrl.endsWith('/') ? cleanUrl : `${cleanUrl}/`;
+        const img = `${base}og.png`;
+        if (ogImage) ogImage.setAttribute('content', img);
+        if (twImage) twImage.setAttribute('content', img);
       })();
     </script>
 

@@ -1,20 +1,35 @@
 # ThemeDatabase
 
-ThemeDatabase is a static GitHub Pages app for discovering 22K+ VS Code themes, filtering by color/token intent, and exporting selected themes as `.vsix` packages.
+One Theme Database to rule them all.
+
+ThemeDatabase is a static GitHub Pages app for exploring 22K+ VS Code themes, filtering by color and token intent, and exporting any theme as a `.vsix` extension package in the browser.
+
+## Screenshots
+
+Home (interactive color picker + filters):
+
+![ThemeDatabase Home](docs/screenshots/home.png)
+
+VSIX Builder (generate and download extension package):
+
+![ThemeDatabase VSIX Builder](docs/screenshots/vsix-builder.png)
+
+## Core Features
+
+- Interactive code preview: click any syntax token color to filter the whole dataset.
+- Color palette + HEX picker: presets, custom picker, and tolerance slider.
+- Theme Explorer: virtualized grid/list browsing for large datasets.
+- Theme Detail: palette breakdown, editor colors, and similar themes.
+- VSIX Builder: validate metadata and generate a downloadable `.vsix` (JSZip, client-side).
+- GitHub Pages-safe routing: `HashRouter` with `base: './'`.
 
 ## Stack
 
 - React + Vite + TypeScript
-- HashRouter for GitHub Pages-safe routing
+- `react-router-dom` (HashRouter)
+- `react-window` virtualization
 - Browser-side VSIX packaging with JSZip
-- Static sharded data under `public/data`
-
-## Key Flows
-
-1. Home / Explorer: Darcula-inspired interactive code preview + color/token filters.
-2. Theme Detail: palette breakdown, metadata, related themes.
-3. VSIX Builder: package config + validation + client-side `.vsix` output.
-4. Success: download and install guidance.
+- Static sharded dataset in `public/data`
 
 ## Data Pipeline
 
@@ -37,7 +52,7 @@ Sync preview assets:
 npm run sync:previews
 ```
 
-Full local build:
+Full local build (data + previews + app):
 
 ```bash
 npm run build:full
@@ -57,9 +72,41 @@ npm run test:run
 npm run smoke
 ```
 
-## Deploy
+## Deploy (GitHub Pages)
 
-GitHub Actions workflow publishes `dist/` to GitHub Pages. Ensure generated `public/data` and preview assets are present before pushing.
+This repo includes a GitHub Actions Pages workflow: `.github/workflows/deploy-pages.yml`.
+
+Deployment flow:
+
+1. Make sure `public/data` and preview assets exist in the repo (static hosting).
+2. Push to `main`.
+3. GitHub Actions builds and publishes `dist/` to Pages.
+
+## GitHub Repository “About” (SEO)
+
+Suggested values for GitHub repo settings:
+
+- **Description**: Global VS Code theme database: pick colors from code, filter 22K+ themes, export as VSIX.
+- **Website**: `https://nsozturk.github.io/ThemeDatabase/`
+- **Topics**:
+  - `vscode`
+  - `vscode-theme`
+  - `theme-database`
+  - `theme-explorer`
+  - `vsix`
+  - `color-matching`
+  - `syntax-highlighting`
+  - `github-pages`
+  - `react`
+  - `vite`
+
+## Screenshots (How To Regenerate)
+
+This repo includes a script that captures real screenshots using your local Chrome:
+
+```bash
+node scripts/capture-screenshots.mjs
+```
 
 ## License
 
@@ -69,7 +116,8 @@ MIT (`LICENSE`)
 
 - SEO tags are defined in `index.html` (description, keywords, Open Graph, Twitter, JSON-LD).
 - `public/robots.txt` and `public/sitemap.xml` are included for GitHub Pages indexing.
-- If your GitHub Pages URL differs from `https://ns0bj.github.io/ThemeDatabase/`, update:
-  - `index.html` canonical + `og:url` + `og:image`
-  - `public/robots.txt` sitemap URL
-  - `public/sitemap.xml` `<loc>`
+- Default Pages URL assumes: `https://nsozturk.github.io/ThemeDatabase/`
+  - If your URL differs, update:
+    - `index.html` canonical + `og:url` + `og:image`
+    - `public/robots.txt` sitemap URL
+    - `public/sitemap.xml` `<loc>`

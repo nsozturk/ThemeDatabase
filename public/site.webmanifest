@@ -1,8 +1,8 @@
 {
   "name": "ThemeDatabase",
   "short_name": "ThemeDB",
-  "description": "VS Code temalarını keşfet, filtrele ve VSIX üret.",
-  "lang": "tr",
+  "description": "Global VS Code theme explorer with color filtering and browser-side VSIX export.",
+  "lang": "en",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
@@ -17,4 +17,3 @@
     }
   ]
 }
-

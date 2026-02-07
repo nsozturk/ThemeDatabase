@@ -1,5 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://ns0bj.github.io/ThemeDatabase/sitemap.xml
-
+Sitemap: https://nsozturk.github.io/ThemeDatabase/sitemap.xml

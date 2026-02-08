@@ -2,12 +2,14 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { getBuildArtifact } from '@/lib/buildArtifactStore';
 import { useI18n } from '@/i18n';
+import type { ExportTarget } from '@/types/export';
 
 interface SuccessState {
   filename?: string;
   mode?: 'exact' | 'fallback';
   themeName?: string;
   version?: string;
+  target?: ExportTarget;
 }
 
 function parseVersionFromFilename(filename: string): string {
@@ -24,10 +26,11 @@ export default function SuccessPage() {
 
   const filename = artifact?.filename ?? state.filename ?? 'theme.vsix';
   const mode = artifact?.mode ?? state.mode ?? 'fallback';
+  const target: ExportTarget = artifact?.target ?? state.target ?? 'vscode-vsix';
   const version = state.version ?? parseVersionFromFilename(filename);
   const sizeMb = artifact ? `${(artifact.blob.size / (1024 * 1024)).toFixed(1)} MB` : '-- MB';
 
-  const installCommand = `code --install-extension ${filename}`;
+  const installCommand = target === 'vscode-vsix' ? `code --install-extension ${filename}` : '';
 
   function onDownload(): void {
     if (!artifact) {
@@ -56,24 +59,55 @@ export default function SuccessPage() {
     }
   }
 
-  const steps = [
-    {
-      title: t('success.step1Title'),
-      detail: t('success.step1Detail'),
-    },
-    {
-      title: t('success.step2Title'),
-      detail: t('success.step2Detail'),
-    },
-    {
-      title: t('success.step3Title'),
-      detail: t('success.step3Detail'),
-    },
-    {
-      title: t('success.step4Title'),
-      detail: t('success.step4Detail'),
-    },
-  ];
+  const steps = (() => {
+    if (target === 'vscode-vsix') {
+      return [
+        { title: t('success.step1Title'), detail: t('success.step1Detail') },
+        { title: t('success.step2Title'), detail: t('success.step2Detail') },
+        { title: t('success.step3Title'), detail: t('success.step3Detail') },
+        { title: t('success.step4Title'), detail: t('success.step4Detail') },
+      ];
+    }
+
+    if (target === 'jetbrains-plugin') {
+      return [
+        { title: t('success.jetbrains.step1Title'), detail: t('success.jetbrains.step1Detail') },
+        { title: t('success.jetbrains.step2Title'), detail: t('success.jetbrains.step2Detail') },
+        { title: t('success.jetbrains.step3Title'), detail: t('success.jetbrains.step3Detail') },
+        { title: t('success.jetbrains.step4Title'), detail: t('success.jetbrains.step4Detail') },
+      ];
+    }
+
+    if (target === 'jetbrains-icls') {
+      return [
+        { title: t('success.jetbrainsIcls.step1Title'), detail: t('success.jetbrainsIcls.step1Detail') },
+        { title: t('success.jetbrainsIcls.step2Title'), detail: t('success.jetbrainsIcls.step2Detail') },
+        { title: t('success.jetbrainsIcls.step3Title'), detail: t('success.jetbrainsIcls.step3Detail') },
+      ];
+    }
+
+    if (target === 'xcode-dvtcolortheme') {
+      return [
+        { title: t('success.xcode.step1Title'), detail: t('success.xcode.step1Detail') },
+        { title: t('success.xcode.step2Title'), detail: t('success.xcode.step2Detail') },
+        { title: t('success.xcode.step3Title'), detail: t('success.xcode.step3Detail') },
+      ];
+    }
+
+    if (target === 'vim-colorscheme') {
+      return [
+        { title: t('success.vim.step1Title'), detail: t('success.vim.step1Detail') },
+        { title: t('success.vim.step2Title'), detail: t('success.vim.step2Detail') },
+        { title: t('success.vim.step3Title'), detail: t('success.vim.step3Detail') },
+      ];
+    }
+
+    return [
+      { title: t('success.emacs.step1Title'), detail: t('success.emacs.step1Detail') },
+      { title: t('success.emacs.step2Title'), detail: t('success.emacs.step2Detail') },
+      { title: t('success.emacs.step3Title'), detail: t('success.emacs.step3Detail') },
+    ];
+  })();
 
   return (
     <main className="tdb-container page-block success-page success-v2-page">
@@ -81,31 +115,33 @@ export default function SuccessPage() {
         <div className="success-v2-primary">
           <article className="success-v2-hero glass-panel-like">
             <div className="success-v2-check" aria-hidden="true">✓</div>
-            <h1>{t('success.title')}</h1>
+            <h1>{target === 'vscode-vsix' ? t('success.title') : t('success.exportReady')}</h1>
             <p>
               {t('success.generatedFor', { name: state.themeName ?? 'Theme' })}
             </p>
 
             <button type="button" onClick={onDownload} disabled={!artifact}>
-              {t('success.download')}
+              {target === 'vscode-vsix' ? t('success.download') : t('success.downloadFile')}
             </button>
 
             <small>{t('success.versionSize', { version, size: sizeMb })}</small>
-            <small>{t('success.source', { mode })}</small>
+            <small>{t('success.source', { mode })} · {t(`success.target.${target}`)}</small>
           </article>
 
-          <article className="success-v2-terminal glass-panel-like">
-            <div className="success-v2-terminal-head">
-              <h2>{t('success.installCli')}</h2>
-              <span>{t('success.optional')}</span>
-            </div>
-            <div className="success-v2-terminal-box">
-              <code>{installCommand}</code>
-              <button type="button" onClick={() => { void onCopyCommand(); }}>
-                {copyState === 'copied' ? t('success.copied') : copyState === 'error' ? t('success.error') : t('success.copy')}
-              </button>
-            </div>
-          </article>
+          {target === 'vscode-vsix' ? (
+            <article className="success-v2-terminal glass-panel-like">
+              <div className="success-v2-terminal-head">
+                <h2>{t('success.installCli')}</h2>
+                <span>{t('success.optional')}</span>
+              </div>
+              <div className="success-v2-terminal-box">
+                <code>{installCommand}</code>
+                <button type="button" onClick={() => { void onCopyCommand(); }}>
+                  {copyState === 'copied' ? t('success.copied') : copyState === 'error' ? t('success.error') : t('success.copy')}
+                </button>
+              </div>
+            </article>
+          ) : null}
         </div>
 
         <aside className="success-v2-guide glass-panel-like">
@@ -136,7 +172,9 @@ export default function SuccessPage() {
 
         <div className="success-v2-footer-actions">
           <Link to="/">{t('success.backToExplorer')}</Link>
-          <a href="https://code.visualstudio.com/docs/editor/extension-marketplace#_install-from-a-vsix" target="_blank" rel="noreferrer">{t('success.viewDocs')}</a>
+          {target === 'vscode-vsix' ? (
+            <a href="https://code.visualstudio.com/docs/editor/extension-marketplace#_install-from-a-vsix" target="_blank" rel="noreferrer">{t('success.viewDocs')}</a>
+          ) : null}
         </div>
       </section>
     </main>

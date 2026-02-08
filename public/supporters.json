@@ -1,0 +1,12 @@
+{
+  "updatedAt": "2026-02-08",
+  "ctaUrl": "https://buymeacoffee.com/ns0bj",
+  "tiers": [
+    { "id": "supporter", "label": "Supporter", "amountUsd": 3 },
+    { "id": "contributor", "label": "Contributor", "amountUsd": 10 },
+    { "id": "sponsor", "label": "Sponsor", "amountUsd": 25 }
+  ],
+  "supporters": [
+    { "name": "Anonymous", "tier": "supporter", "since": "2026-02" }
+  ]
+}

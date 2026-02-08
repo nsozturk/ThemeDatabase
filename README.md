@@ -10,9 +10,13 @@ Home (interactive color picker + filters):
 
 ![ThemeDatabase Home](docs/screenshots/home.png)
 
-VSIX Builder (generate and download extension package):
+Export Builder (VSIX + other targets):
 
 ![ThemeDatabase VSIX Builder](docs/screenshots/vsix-builder.png)
+
+Theme Pack Builder (select up to 10 themes, export as one VSIX):
+
+![ThemeDatabase Theme Pack Builder](docs/screenshots/theme-pack-builder.png)
 
 ## Core Features
 
@@ -20,7 +24,15 @@ VSIX Builder (generate and download extension package):
 - Color palette + HEX picker: presets, custom picker, and tolerance slider.
 - Theme Explorer: virtualized grid/list browsing for large datasets.
 - Theme Detail: palette breakdown, editor colors, and similar themes.
-- VSIX Builder: validate metadata and generate a downloadable `.vsix` (JSZip, client-side).
+- Theme selection (max 10): pin selected themes to the top and remove duplicates from the main list.
+- Theme Pack Builder: export selected themes as a single `.vsix` theme pack.
+- Export Builder: generate artifacts client-side:
+  - VS Code `.vsix`
+  - JetBrains color scheme (`.icls`) and plugin zip
+  - Xcode `.dvtcolortheme`
+  - Vim colorscheme
+  - Emacs theme
+- Support popover: Buy Me a Coffee link + manual supporters list (`public/supporters.json`).
 - GitHub Pages-safe routing: `HashRouter` with `base: './'`.
 
 ## Stack
@@ -86,7 +98,7 @@ Deployment flow:
 
 Suggested values for GitHub repo settings:
 
-- **Description**: Global VS Code theme database: pick colors from code, filter 22K+ themes, export as VSIX.
+- **Description**: Global theme database: pick colors from code, filter 22K+ themes, export to VS Code/JetBrains/Xcode/Vim/Emacs.
 - **Website**: `https://nsozturk.github.io/ThemeDatabase/`
 - **Topics**:
   - `vscode`
@@ -94,6 +106,10 @@ Suggested values for GitHub repo settings:
   - `theme-database`
   - `theme-explorer`
   - `vsix`
+  - `jetbrains`
+  - `xcode`
+  - `vim`
+  - `emacs`
   - `color-matching`
   - `syntax-highlighting`
   - `github-pages`
@@ -107,6 +123,14 @@ This repo includes a script that captures real screenshots using your local Chro
 ```bash
 node scripts/capture-screenshots.mjs
 ```
+
+## Support Link
+
+The support CTA is configured in `public/supporters.json`:
+
+- `ctaUrl`: `https://buymeacoffee.com/ns0bj`
+- `tiers`: used for suggested amounts in the support popover
+- `supporters`: manual “Thanks” list displayed in About
 
 ## License
 

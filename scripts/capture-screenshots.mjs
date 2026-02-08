@@ -69,6 +69,20 @@ async function main() {
       await page.goto(`${BASE}/#/builder/dracula-theme-6233fe1b`, { waitUntil: 'networkidle0' });
       await page.waitForSelector('.builder-v2-shell', { timeout: 30_000 });
       await page.screenshot({ path: path.join(OUT_DIR, 'vsix-builder.png'), fullPage: true });
+
+      // Theme Pack Builder (seed a few selected themes in localStorage).
+      await page.goto(`${BASE}/#/`, { waitUntil: 'networkidle0' });
+      await page.evaluate(() => {
+        localStorage.setItem('tdb.selectedThemeIds', JSON.stringify([
+          '2017-dark-visual-studio-c-c-4e80493e',
+          'github-dark-27bccb10',
+          'github-dark-default-a576fdc2',
+          'github-dark-dimmed-d11f52d',
+        ]));
+      });
+      await page.goto(`${BASE}/#/pack`, { waitUntil: 'networkidle0' });
+      await page.waitForSelector('.builder-v2-shell', { timeout: 30_000 });
+      await page.screenshot({ path: path.join(OUT_DIR, 'theme-pack-builder.png'), fullPage: true });
     } finally {
       await browser.close();
     }
@@ -81,4 +95,3 @@ main().catch((err) => {
   console.error(err);
   process.exit(1);
 });
-

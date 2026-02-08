@@ -2,6 +2,7 @@ import { startTransition, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FiltersPanel } from '@/components/FiltersPanel';
 import { HeroCodePicker } from '@/components/HeroCodePicker';
+import { HomeFeaturePreview } from '@/components/HomeFeaturePreview';
 import { LoadingBar } from '@/components/LoadingBar';
 import { ThemeCard } from '@/components/ThemeCard';
 import { VirtualThemeCollection } from '@/components/VirtualThemeCollection';
@@ -83,6 +84,8 @@ export default function HomePage() {
 
   return (
     <main className="tdb-container tdb-main">
+      <HomeFeaturePreview selectedThemeId={selected.selectedIds[0]} />
+
       <HeroCodePicker
         onPick={(role, hex) => {
           startTransition(() => {

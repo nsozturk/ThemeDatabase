@@ -102,6 +102,8 @@ export default function PackBuilderPage() {
     return parsed.success ? [] : parsed.error.issues.map((issue) => `${issue.path.join('.')}: ${issue.message}`);
   }, [form]);
 
+  const publisherValid = useMemo(() => /^[a-z0-9][a-z0-9-]*$/.test(form.publisher), [form.publisher]);
+
   const manifestPreview = useMemo(() => {
     if (!items.length) return '';
     return JSON.stringify({
@@ -214,33 +216,72 @@ export default function PackBuilderPage() {
               <p>{t('pack.subtitle')}</p>
             </div>
 
-            <section className="builder-v2-fields">
-              <div className="builder-v2-field-row">
-                <label>
-                  <span>publisher</span>
-                  <input value={form.publisher} onChange={(e) => setForm({ ...form, publisher: e.target.value })} />
-                </label>
-                <label>
-                  <span>version</span>
-                  <input value={form.version} onChange={(e) => setForm({ ...form, version: e.target.value })} />
-                </label>
-              </div>
+            <form
+              id="pack-builder-form"
+              className="builder-v2-form"
+              onSubmit={(event) => {
+                event.preventDefault();
+                void onBuild();
+              }}
+            >
+              <section>
+                <h4>{t('pack.identityTitle')}</h4>
+                <div className="builder-v2-grid-2">
+                  <label>
+                    <span>{t('pack.field.publisher')}</span>
+                    <div className="builder-v2-input-wrap">
+                      <input
+                        name="publisher"
+                        autoComplete="off"
+                        value={form.publisher}
+                        onChange={(e) => setForm({ ...form, publisher: sanitizeBase(e.target.value) || e.target.value })}
+                      />
+                      <i aria-hidden="true" className={publisherValid ? 'is-ok' : 'is-bad'} />
+                    </div>
+                  </label>
 
-              <label>
-                <span>displayName</span>
-                <input value={form.displayName} onChange={(e) => setForm({ ...form, displayName: e.target.value })} />
-              </label>
+                  <label>
+                    <span>{t('pack.field.version')}</span>
+                    <input
+                      name="version"
+                      autoComplete="off"
+                      value={form.version}
+                      onChange={(e) => setForm({ ...form, version: e.target.value.trim() })}
+                    />
+                  </label>
 
-              <label>
-                <span>name</span>
-                <input value={form.name} onChange={(e) => setForm({ ...form, name: sanitizeBase(e.target.value) || e.target.value })} />
-              </label>
+                  <label className="full">
+                    <span>{t('pack.field.displayName')}</span>
+                    <input
+                      name="displayName"
+                      autoComplete="off"
+                      value={form.displayName}
+                      onChange={(e) => setForm({ ...form, displayName: e.target.value })}
+                    />
+                  </label>
 
-              <label>
-                <span>description</span>
-                <input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
-              </label>
-            </section>
+                  <label className="full">
+                    <span>{t('pack.field.name')}</span>
+                    <input
+                      name="name"
+                      autoComplete="off"
+                      value={form.name}
+                      onChange={(e) => setForm({ ...form, name: sanitizeBase(e.target.value) || e.target.value })}
+                    />
+                  </label>
+
+                  <label className="full">
+                    <span>{t('pack.field.description')}</span>
+                    <input
+                      name="description"
+                      autoComplete="off"
+                      value={form.description}
+                      onChange={(e) => setForm({ ...form, description: e.target.value })}
+                    />
+                  </label>
+                </div>
+              </section>
+            </form>
 
             {validationErrors.length ? (
               <ul className="error-list" aria-live="polite">

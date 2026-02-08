@@ -5,11 +5,14 @@ import { ThemeCard } from '@/components/ThemeCard';
 interface VirtualThemeCollectionProps {
   items: ThemeIndexRecord[];
   view: 'grid' | 'list';
+  selectedSet: Set<string>;
+  selectionDisabled: boolean;
+  onToggleSelected: (id: string) => void;
 }
 
 const overscan = 3;
 
-export function VirtualThemeCollection({ items, view }: VirtualThemeCollectionProps) {
+export function VirtualThemeCollection({ items, view, selectedSet, selectionDisabled, onToggleSelected }: VirtualThemeCollectionProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [scrollTop, setScrollTop] = useState(0);
   const [height, setHeight] = useState(680);
@@ -74,7 +77,14 @@ export function VirtualThemeCollection({ items, view }: VirtualThemeCollectionPr
               }}
             >
               {row.map((theme) => (
-                <ThemeCard key={theme.id} theme={theme} view={view} />
+                <ThemeCard
+                  key={theme.id}
+                  theme={theme}
+                  view={view}
+                  selected={selectedSet.has(theme.id)}
+                  selectionDisabled={selectionDisabled}
+                  onToggleSelected={onToggleSelected}
+                />
               ))}
             </div>
           );

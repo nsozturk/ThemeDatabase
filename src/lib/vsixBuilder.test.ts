@@ -1,5 +1,5 @@
 import JSZip from 'jszip';
-import { buildInputSchema, buildVsixArtifact } from '@/lib/vsixBuilder';
+import { buildInputSchema, buildVsixArtifact, buildVsixPackArtifact } from '@/lib/vsixBuilder';
 import type { ThemeIndexRecord, VsixPayloadRecord } from '@/types/theme';
 
 const record: ThemeIndexRecord = {
@@ -63,5 +63,46 @@ describe('vsix builder', () => {
     expect(zip.file('extension/themes/darcula-pack.json')).toBeTruthy();
     expect(zip.file('extension.vsixmanifest')).toBeTruthy();
     expect(zip.file('[Content_Types].xml')).toBeTruthy();
+  });
+
+  it('builds a multi-theme vsix pack', async () => {
+    const record2: ThemeIndexRecord = {
+      ...record,
+      id: 'theme-2',
+      themeInternalName: 'nebula',
+      themeDisplayName: 'Nebula',
+    };
+
+    const payload2: VsixPayloadRecord = {
+      ...payload,
+      themeId: 'theme-2',
+      mode: 'exact',
+      themeJson: {
+        ...payload.themeJson,
+        name: 'Nebula',
+        colors: {
+          'editor.background': '#111827',
+        },
+      },
+    };
+
+    const artifact = await buildVsixPackArtifact({
+      publisher: 'theme-db',
+      name: 'multi-pack',
+      displayName: 'Multi Pack',
+      version: '1.0.0',
+      description: 'Generated package',
+    }, [
+      { record, payload },
+      { record: record2, payload: payload2 },
+    ]);
+
+    const zip = await JSZip.loadAsync(artifact.blob);
+    const pkg = await zip.file('extension/package.json')?.async('string');
+    expect(pkg).toContain('multi-pack');
+    expect(zip.file('extension.vsixmanifest')).toBeTruthy();
+
+    const files = Object.keys(zip.files).filter((name) => name.startsWith('extension/themes/') && name.endsWith('.json'));
+    expect(files.length).toBe(2);
   });
 });

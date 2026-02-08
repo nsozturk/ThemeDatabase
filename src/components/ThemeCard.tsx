@@ -6,6 +6,9 @@ import type { ThemeIndexRecord } from '@/types/theme';
 interface ThemeCardProps {
   theme: ThemeIndexRecord;
   view: 'grid' | 'list';
+  selected: boolean;
+  selectionDisabled: boolean;
+  onToggleSelected: (id: string) => void;
 }
 
 function Preview({ theme, unavailableLabel }: { theme: ThemeIndexRecord; unavailableLabel: string }) {
@@ -43,7 +46,7 @@ function Preview({ theme, unavailableLabel }: { theme: ThemeIndexRecord; unavail
   );
 }
 
-export function ThemeCard({ theme, view }: ThemeCardProps) {
+export function ThemeCard({ theme, view, selected, selectionDisabled, onToggleSelected }: ThemeCardProps) {
   const { t } = useI18n();
   const navigate = useNavigate();
 
@@ -53,7 +56,7 @@ export function ThemeCard({ theme, view }: ThemeCardProps) {
 
   const ignoreCardNavigation = (target: EventTarget | null): boolean => {
     const element = target as HTMLElement | null;
-    return Boolean(element?.closest('a, button, input, select, textarea'));
+    return Boolean(element?.closest('a, button, input, select, textarea, label'));
   };
 
   const onCardClick = (event: MouseEvent<HTMLElement>): void => {
@@ -75,7 +78,7 @@ export function ThemeCard({ theme, view }: ThemeCardProps) {
 
   return (
     <article
-      className={`theme-card is-clickable ${view}`}
+      className={`theme-card is-clickable ${view} ${selected ? 'is-selected' : ''}`}
       role="link"
       tabIndex={0}
       aria-label={t('card.openDetail', { name: theme.themeDisplayName })}
@@ -83,6 +86,18 @@ export function ThemeCard({ theme, view }: ThemeCardProps) {
       onKeyDown={onCardKeyDown}
     >
       <div className="preview-wrap">
+        <label className={`theme-select ${selected ? 'is-checked' : ''} ${!selected && selectionDisabled ? 'is-disabled' : ''}`}>
+          <input
+            type="checkbox"
+            checked={selected}
+            disabled={!selected && selectionDisabled}
+            onChange={() => onToggleSelected(theme.id)}
+            aria-label={selected ? t('card.deselect', { name: theme.themeDisplayName }) : t('card.select', { name: theme.themeDisplayName })}
+          />
+          <span className="theme-select-ui" aria-hidden="true">
+            <span className="theme-select-box" />
+          </span>
+        </label>
         <Preview key={theme.id} theme={theme} unavailableLabel={t('card.previewUnavailable')} />
       </div>
       <div className="theme-meta">

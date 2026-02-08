@@ -1,6 +1,7 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useI18n } from '@/i18n';
+import { getSupporters, type SupportersDoc, type SupportTierId } from '@/lib/supportersClient';
 
 const databaseSnapshot = {
   themesIndexed: 22037,
@@ -26,6 +27,8 @@ const palettePreview = [
 
 export default function AboutPage() {
   const { t, formatNumber } = useI18n();
+  const [supportersDoc, setSupportersDoc] = useState<SupportersDoc | null>(null);
+  const [supportersError, setSupportersError] = useState(false);
 
   const stats = useMemo(
     () => [
@@ -36,6 +39,65 @@ export default function AboutPage() {
     ],
     [t],
   );
+
+  useEffect(() => {
+    let canceled = false;
+    getSupporters()
+      .then((doc) => {
+        if (!canceled) {
+          setSupportersDoc(doc);
+          setSupportersError(false);
+        }
+      })
+      .catch(() => {
+        if (!canceled) {
+          setSupportersError(true);
+        }
+      });
+    return () => {
+      canceled = true;
+    };
+  }, []);
+
+  const tiers = useMemo(() => {
+    const byId = new Map<SupportTierId, { amountUsd: number }>();
+    for (const tier of supportersDoc?.tiers ?? []) {
+      byId.set(tier.id, { amountUsd: tier.amountUsd });
+    }
+
+    const fmt = (id: SupportTierId, fallbackAmount: number) => {
+      const amountUsd = byId.get(id)?.amountUsd ?? fallbackAmount;
+      return `$${amountUsd} / month`;
+    };
+
+    return [
+      {
+        id: 'supporter' as const,
+        price: fmt('supporter', 3),
+        title: t('support.tier.supporter.name'),
+        perks: [t('support.tier.supporter.perk1')],
+      },
+      {
+        id: 'contributor' as const,
+        price: fmt('contributor', 10),
+        title: t('support.tier.contributor.name'),
+        perks: [t('support.tier.contributor.perk1')],
+      },
+      {
+        id: 'sponsor' as const,
+        price: fmt('sponsor', 25),
+        title: t('support.tier.sponsor.name'),
+        perks: [t('support.tier.sponsor.perk1'), t('support.tier.sponsor.perk2')],
+      },
+    ];
+  }, [supportersDoc, t]);
+
+  const supportersSorted = useMemo(() => {
+    const rank: Record<SupportTierId, number> = { sponsor: 3, contributor: 2, supporter: 1 };
+    return (supportersDoc?.supporters ?? [])
+      .slice()
+      .sort((a, b) => (rank[b.tier] - rank[a.tier]) || a.name.localeCompare(b.name));
+  }, [supportersDoc]);
 
   const engineCards = useMemo(
     () => [
@@ -182,6 +244,71 @@ export default function AboutPage() {
         <div className="about-v2-license-actions">
           <span>{t('about.licenseBadge')}</span>
           <Link to="/license">{t('about.licenseView')}</Link>
+        </div>
+      </section>
+
+      <section className="about-v2-support">
+        <div className="about-v2-support-head">
+          <div>
+            <p className="about-v2-kicker">{t('support.kicker')}</p>
+            <h2>{t('support.title')}</h2>
+            <p className="about-v2-support-body">{t('support.body')}</p>
+          </div>
+          <div className="about-v2-support-actions">
+            <a
+              className="support-v2-cta"
+              href={supportersDoc?.ctaUrl ?? 'https://patreon.com/'}
+              target="_blank"
+              rel="noreferrer nofollow"
+            >
+              {t('support.cta')}
+            </a>
+          </div>
+        </div>
+
+        <div className="support-v2-tier-grid" aria-label={t('support.tiersTitle')}>
+          {tiers.map((tier) => (
+            <article key={tier.id} className="support-v2-tier-card">
+              <header>
+                <strong>{tier.price}</strong>
+                <h3>{tier.title}</h3>
+              </header>
+              <ul>
+                {tier.perks.map((perk) => <li key={perk}>{perk}</li>)}
+              </ul>
+            </article>
+          ))}
+        </div>
+
+        <div className="support-v2-bottom">
+          <article className="support-v2-how">
+            <h3>{t('support.howTitle')}</h3>
+            <p>{t('support.howBody')}</p>
+          </article>
+
+          <article className="support-v2-thanks">
+            <h3>{t('support.thanksTitle')}</h3>
+            {supportersError ? (
+              <p className="builder-v2-muted">{t('support.unavailable')}</p>
+            ) : !supportersDoc ? (
+              <ul className="support-v2-thanks-list is-loading" aria-live="polite">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <li key={i} className="support-v2-skeleton" aria-hidden="true" />
+                ))}
+              </ul>
+            ) : supportersSorted.length ? (
+              <ul className="support-v2-thanks-list" aria-live="polite">
+                {supportersSorted.map((entry, index) => (
+                  <li key={`${entry.name}-${index}`}>
+                    <span className="support-v2-name">{entry.name}</span>
+                    <span className="support-v2-pill">{t(`support.tier.${entry.tier}.name`)}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="builder-v2-muted">{t('support.unavailable')}</p>
+            )}
+          </article>
         </div>
       </section>
     </main>

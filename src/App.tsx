@@ -9,6 +9,7 @@ const LicensePage = lazy(() => import('@/features/license/LicensePage'));
 const ThemeDetailPage = lazy(() => import('@/features/detail/ThemeDetailPage'));
 const BuilderPage = lazy(() => import('@/features/builder/BuilderPage'));
 const SuccessPage = lazy(() => import('@/features/success/SuccessPage'));
+const PackBuilderPage = lazy(() => import('@/features/pack/PackBuilderPage'));
 
 export default function App() {
   const { t } = useI18n();
@@ -26,7 +27,9 @@ export default function App() {
               <Route path="/license" element={<LicensePage />} />
               <Route path="/themes/:themeId" element={<ThemeDetailPage />} />
               <Route path="/builder/:themeId" element={<BuilderPage />} />
+              <Route path="/pack" element={<PackBuilderPage />} />
               <Route path="/vsix/success" element={<SuccessPage />} />
+              <Route path="/export/success" element={<SuccessPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Suspense>

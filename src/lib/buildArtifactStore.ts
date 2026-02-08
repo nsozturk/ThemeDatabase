@@ -1,11 +1,11 @@
-import type { BuiltVsixArtifact } from '@/lib/vsixBuilder';
+import type { BuiltArtifact } from '@/types/export';
 
-let currentArtifact: BuiltVsixArtifact | null = null;
+let currentArtifact: BuiltArtifact | null = null;
 
-export function setBuildArtifact(artifact: BuiltVsixArtifact): void {
+export function setBuildArtifact(artifact: BuiltArtifact): void {
   currentArtifact = artifact;
 }
 
-export function getBuildArtifact(): BuiltVsixArtifact | null {
+export function getBuildArtifact(): BuiltArtifact | null {
   return currentArtifact;
 }

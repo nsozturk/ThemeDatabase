@@ -162,7 +162,7 @@ export default function BuilderPage() {
     const source = buildExportSource(theme, payload, detail ?? null, quickTweaks);
     const defs = exportTarget.startsWith('jetbrains')
       ? JETBRAINS_FIELDS
-      : exportTarget === 'xcode-dvtcolortheme'
+      : exportTarget === 'xcode-dvtcolortheme' || exportTarget === 'xcode-xccolortheme'
         ? XCODE_FIELDS
         : exportTarget === 'vim-colorscheme'
           ? VIM_FIELDS
@@ -338,8 +338,8 @@ export default function BuilderPage() {
                       ? await buildJetBrainsPluginArtifact({ filenameBase: base, displayName: exportForm.displayName, version: exportForm.version, mode }, filtered)
                       : exportTarget === 'jetbrains-icls'
                         ? await buildJetBrainsIclsArtifact({ filenameBase: base, displayName: exportForm.displayName, version: exportForm.version, mode }, filtered)
-                        : exportTarget === 'xcode-dvtcolortheme'
-                          ? await buildXcodeArtifact({ filenameBase: base, mode }, filtered)
+                        : exportTarget === 'xcode-dvtcolortheme' || exportTarget === 'xcode-xccolortheme'
+                          ? await buildXcodeArtifact({ filenameBase: base, mode, format: exportTarget === 'xcode-xccolortheme' ? 'xc' : 'dvt' }, filtered)
                           : exportTarget === 'vim-colorscheme'
                             ? await buildVimArtifact({ filenameBase: base, mode }, filtered)
                             : await buildEmacsArtifact({ filenameBase: base, displayName: exportForm.displayName, mode }, filtered);

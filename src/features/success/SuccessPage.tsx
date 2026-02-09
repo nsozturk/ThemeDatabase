@@ -86,9 +86,10 @@ export default function SuccessPage() {
       ];
     }
 
-    if (target === 'xcode-dvtcolortheme') {
+    if (target === 'xcode-dvtcolortheme' || target === 'xcode-xccolortheme') {
+      const ext = target === 'xcode-xccolortheme' ? '.xccolortheme' : '.dvtcolortheme';
       return [
-        { title: t('success.xcode.step1Title'), detail: t('success.xcode.step1Detail') },
+        { title: t('success.xcode.step1Title'), detail: t('success.xcode.step1Detail', { ext }) },
         { title: t('success.xcode.step2Title'), detail: t('success.xcode.step2Detail') },
         { title: t('success.xcode.step3Title'), detail: t('success.xcode.step3Detail') },
       ];

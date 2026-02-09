@@ -60,7 +60,7 @@ describe('xcode exporter', () => {
   it('builds a dvtcolortheme plist', async () => {
     const src = buildExportSource(theme, payload, detail, {});
     const planned = buildStrictExportPlan('xcode-dvtcolortheme', src, XCODE_FIELDS, {}, {});
-    const artifact = await buildXcodeArtifact({ filenameBase: 'darcula', mode: 'fallback' }, planned);
+    const artifact = await buildXcodeArtifact({ filenameBase: 'darcula', mode: 'fallback', format: 'dvt' }, planned);
     expect(artifact.filename).toMatch(/\.dvtcolortheme$/);
     const text = await new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
@@ -69,6 +69,23 @@ describe('xcode exporter', () => {
       reader.readAsText(artifact.blob);
     });
     expect(text).toContain('<plist');
-    expect(text).toContain('DVTSourceTextBackgroundColor');
+    expect(text).toContain('DVTSourceTextBackground');
+    expect(text).toContain('DVTSourceTextSyntaxColors');
+    expect(text).toContain('xcode.syntax.comment');
+  });
+
+  it('builds an xccolortheme plist with header fields', async () => {
+    const src = buildExportSource(theme, payload, detail, {});
+    const planned = buildStrictExportPlan('xcode-xccolortheme', src, XCODE_FIELDS, {}, {});
+    const artifact = await buildXcodeArtifact({ filenameBase: 'darcula', mode: 'fallback', format: 'xc' }, planned);
+    expect(artifact.filename).toMatch(/\.xccolortheme$/);
+    const text = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result ?? ''));
+      reader.onerror = () => reject(reader.error);
+      reader.readAsText(artifact.blob);
+    });
+    expect(text).toContain('DVTFontAndColorVersion');
+    expect(text).toContain('DVTSourceTextSyntaxColors');
   });
 });

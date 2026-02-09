@@ -3,6 +3,7 @@ export type ExportTarget =
   | 'jetbrains-plugin'
   | 'jetbrains-icls'
   | 'xcode-dvtcolortheme'
+  | 'xcode-xccolortheme'
   | 'vim-colorscheme'
   | 'emacs-theme';
 
@@ -30,4 +31,3 @@ export interface ExportBuildPlan {
   included: ExportFieldValue[];
   excluded: Array<{ key: string; reason: ExportExcludedReason }>;
 }
-

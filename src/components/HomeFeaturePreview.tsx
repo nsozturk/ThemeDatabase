@@ -32,7 +32,7 @@ export function HomeFeaturePreview({ selectedThemeId }: { selectedThemeId?: stri
   if (dismissed) return null;
 
   return (
-    <section className="home-feature-preview" aria-label="Feature preview">
+    <section className="home-feature-preview" aria-label={t('homePreview.ariaLabel')}>
       <button
         type="button"
         className="home-feature-preview__close"
@@ -77,4 +77,3 @@ export function HomeFeaturePreview({ selectedThemeId }: { selectedThemeId?: stri
     </section>
   );
 }
-

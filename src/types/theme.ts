@@ -1,4 +1,7 @@
-export type SyntaxRole = 'comment' | 'string' | 'keyword' | 'function' | 'variable' | 'number' | 'type' | 'operator';
+export type SyntaxRole =
+  | 'comment' | 'string' | 'keyword' | 'function' | 'variable' | 'number' | 'type' | 'operator'
+  | 'attribute' | 'character' | 'preprocessor' | 'url' | 'regex' | 'class' | 'constant' | 'macro'
+  | 'mark' | 'declaration';
 
 export interface SyntaxSummaryItem {
   hex: string;

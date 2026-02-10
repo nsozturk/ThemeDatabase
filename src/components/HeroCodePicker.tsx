@@ -1,8 +1,18 @@
 import { useMemo, useState, type CSSProperties } from 'react';
 import { useI18n } from '@/i18n';
-import type { SyntaxRole } from '@/types/theme';
 
-type PickableRole = SyntaxRole | 'background';
+// Keep the hero picker intentionally small. Export targets (e.g. Xcode) may support
+// more roles, but the home hero only exposes the core roles users expect.
+type PickableRole =
+  | 'background'
+  | 'comment'
+  | 'string'
+  | 'keyword'
+  | 'function'
+  | 'variable'
+  | 'number'
+  | 'type'
+  | 'operator';
 
 interface HeroCodePickerProps {
   onPick: (role: PickableRole, hex: string) => void;

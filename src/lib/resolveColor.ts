@@ -205,3 +205,33 @@ export function resolveFromTokenRole(
 
   return null;
 }
+
+/**
+ * Resolve a token role with an ordered list of fallback roles.
+ * Used for Xcode fields like identifier.class.system which may
+ * not have a direct match — falls back to class, then type, etc.
+ */
+export function resolveFromTokenRoleWithFallbacks(
+  source: ExportSource,
+  roles: SyntaxRole[],
+): ResolvedColor | null {
+  for (const role of roles) {
+    const result = resolveFromTokenRole(source, role);
+    if (result) return result;
+  }
+  return null;
+}
+
+/**
+ * Lighten an RGBA color by a factor (0-1). Used to derive
+ * "system" variants that Xcode expects to be slightly different.
+ */
+export function lightenColor(rgba: RgbaColor, factor: number): RgbaColor {
+  const f = Math.max(0, Math.min(1, factor));
+  return {
+    r: clampByte(rgba.r + (255 - rgba.r) * f),
+    g: clampByte(rgba.g + (255 - rgba.g) * f),
+    b: clampByte(rgba.b + (255 - rgba.b) * f),
+    a: rgba.a,
+  };
+}

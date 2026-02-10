@@ -13,10 +13,24 @@ function escapeXml(value: string): string {
     .replaceAll("'", '&apos;');
 }
 
+/** User-selectable font configuration for Xcode themes. */
+export interface XcodeFontConfig {
+  fontFamily: string;   // e.g. "SFMono-Regular", "Menlo-Regular"
+  boldFamily: string;   // e.g. "SFMono-Bold", "Menlo-Bold"
+  fontSize: number;     // e.g. 13
+}
+
+export const DEFAULT_FONT_CONFIG: XcodeFontConfig = {
+  fontFamily: 'SFMono-Regular',
+  boldFamily: 'SFMono-Bold',
+  fontSize: 13,
+};
+
 export interface XcodeExportInput {
   filenameBase: string; // without extension
   mode: 'exact' | 'fallback';
   format: XcodeFormat;
+  fontConfig?: XcodeFontConfig;
 }
 
 type PlistPrimitive =
@@ -44,11 +58,58 @@ function dictXml(dict: Record<string, PlistPrimitive>, indent = ''): string {
   return `${indent}<dict>\n${body}\n${indent}</dict>`;
 }
 
+/**
+ * Build a font plist string like "SFMono-Regular - 13.0".
+ */
+function fontEntry(family: string, size: number): PlistPrimitive {
+  return { kind: 'string', value: `${family} - ${size.toFixed(1)}` };
+}
+
+/**
+ * All Xcode syntax font keys that should be present in DVTSourceTextSyntaxFonts.
+ * Each corresponds to a color key in DVTSourceTextSyntaxColors.
+ */
+const SYNTAX_FONT_KEYS = [
+  'xcode.syntax.plain',
+  'xcode.syntax.comment',
+  'xcode.syntax.comment.doc',
+  'xcode.syntax.comment.doc.keyword',
+  'xcode.syntax.string',
+  'xcode.syntax.keyword',
+  'xcode.syntax.number',
+  'xcode.syntax.attribute',
+  'xcode.syntax.character',
+  'xcode.syntax.preprocessor',
+  'xcode.syntax.url',
+  'xcode.syntax.mark',
+  'xcode.syntax.regex',
+  'xcode.syntax.regex.keyword',
+  'xcode.syntax.regex.capture.variable',
+  'xcode.syntax.regex.character.class',
+  'xcode.syntax.regex.number',
+  'xcode.syntax.regex.constant',
+  'xcode.syntax.identifier.function',
+  'xcode.syntax.identifier.function.system',
+  'xcode.syntax.identifier.variable',
+  'xcode.syntax.identifier.variable.system',
+  'xcode.syntax.identifier.type',
+  'xcode.syntax.identifier.type.system',
+  'xcode.syntax.identifier.class',
+  'xcode.syntax.identifier.class.system',
+  'xcode.syntax.identifier.constant',
+  'xcode.syntax.identifier.constant.system',
+  'xcode.syntax.identifier.macro',
+  'xcode.syntax.identifier.macro.system',
+  'xcode.syntax.declaration.type',
+  'xcode.syntax.declaration.other',
+];
+
 export async function buildXcodeArtifact(
   input: XcodeExportInput,
   planned: PlannedCatalog,
 ): Promise<BuiltArtifact> {
   const top: Record<string, PlistPrimitive> = {};
+  const fc = input.fontConfig ?? DEFAULT_FONT_CONFIG;
 
   // `.xccolortheme` files usually contain a minimal header for versioning/format.
   if (input.format === 'xc') {
@@ -82,6 +143,28 @@ export async function buildXcodeArtifact(
       top[item.key] = { kind: 'string', value: floatString };
     }
   }
+
+  // ─── Font entries ──────────────────────────────────────────────
+  // DVTSourceTextSyntaxFonts — one entry per syntax key
+  const syntaxFonts = ensureDict('DVTSourceTextSyntaxFonts');
+  for (const key of SYNTAX_FONT_KEYS) {
+    // Keywords and markup-related items get bold variant in Xcode convention
+    const isBold = key.includes('keyword') || key === 'xcode.syntax.mark';
+    syntaxFonts[key] = fontEntry(isBold ? fc.boldFamily : fc.fontFamily, fc.fontSize);
+  }
+
+  // Console fonts
+  top.DVTConsoleTextFont = fontEntry(fc.fontFamily, fc.fontSize);
+
+  // Markup fonts (documentation rendering)
+  top.DVTMarkupTextCodeFont = fontEntry(fc.fontFamily, fc.fontSize);
+  top.DVTMarkupTextEmphasisFont = fontEntry(fc.fontFamily, fc.fontSize);
+  top.DVTMarkupTextStrongFont = fontEntry(fc.boldFamily, fc.fontSize);
+  top.DVTMarkupTextNormalFont = fontEntry(fc.fontFamily, fc.fontSize);
+  top.DVTMarkupTextPrimaryHeadingFont = fontEntry(fc.boldFamily, fc.fontSize + 6);
+  top.DVTMarkupTextSecondaryHeadingFont = fontEntry(fc.boldFamily, fc.fontSize + 3);
+  top.DVTMarkupTextOtherHeadingFont = fontEntry(fc.boldFamily, fc.fontSize + 1);
+  top.DVTMarkupTextLinkFont = fontEntry(fc.fontFamily, fc.fontSize);
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>\n` +
     `<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n` +

@@ -15,7 +15,7 @@ import { XCODE_FIELDS } from '@/exports/xcode/catalog';
 import { VIM_FIELDS } from '@/exports/vim/catalog';
 import { EMACS_FIELDS } from '@/exports/emacs/catalog';
 import { buildJetBrainsIclsArtifact, buildJetBrainsPluginArtifact } from '@/exports/jetbrains/exporter';
-import { buildXcodeArtifact } from '@/exports/xcode/exporter';
+import { buildXcodeArtifact, DEFAULT_FONT_CONFIG, type XcodeFontConfig } from '@/exports/xcode/exporter';
 import { buildVimArtifact } from '@/exports/vim/exporter';
 import { buildEmacsArtifact } from '@/exports/emacs/exporter';
 import { buildVsCodeVsixArtifact } from '@/exports/vscode/exporter';
@@ -60,6 +60,10 @@ export default function BuilderPage() {
 
   const [fieldOverrides, setFieldOverrides] = useState<Record<string, string | undefined>>({});
   const [fieldEnabled, setFieldEnabled] = useState<Record<string, boolean | undefined>>({});
+
+  const [fontConfig, setFontConfig] = useState<XcodeFontConfig>({ ...DEFAULT_FONT_CONFIG });
+
+  const isXcodeTarget = exportTarget === 'xcode-dvtcolortheme' || exportTarget === 'xcode-xccolortheme';
 
   const [form, setForm] = useState({
     publisher: 'themedatabase',
@@ -339,7 +343,7 @@ export default function BuilderPage() {
                       : exportTarget === 'jetbrains-icls'
                         ? await buildJetBrainsIclsArtifact({ filenameBase: base, displayName: exportForm.displayName, version: exportForm.version, mode }, filtered)
                         : exportTarget === 'xcode-dvtcolortheme' || exportTarget === 'xcode-xccolortheme'
-                          ? await buildXcodeArtifact({ filenameBase: base, mode, format: exportTarget === 'xcode-xccolortheme' ? 'xc' : 'dvt' }, filtered)
+                          ? await buildXcodeArtifact({ filenameBase: base, mode, format: exportTarget === 'xcode-xccolortheme' ? 'xc' : 'dvt', fontConfig }, filtered)
                           : exportTarget === 'vim-colorscheme'
                             ? await buildVimArtifact({ filenameBase: base, mode }, filtered)
                             : await buildEmacsArtifact({ filenameBase: base, displayName: exportForm.displayName, mode }, filtered);
@@ -534,6 +538,55 @@ export default function BuilderPage() {
                         {t(category.key)}
                       </span>
                     ))}
+                  </div>
+                </section>
+              ) : null}
+
+              {isXcodeTarget ? (
+                <section className="builder-v2-font-config">
+                  <h4>{t('builder.fontConfig')}</h4>
+                  <div className="builder-v2-grid-2">
+                    <label>
+                      <span>{t('builder.fontFamily')}</span>
+                      <select
+                        value={fontConfig.fontFamily}
+                        onChange={(event) => {
+                          const family = event.target.value;
+                          const boldMap: Record<string, string> = {
+                            'SFMono-Regular': 'SFMono-Bold',
+                            'Menlo-Regular': 'Menlo-Bold',
+                            'JetBrainsMono-Regular': 'JetBrainsMono-Bold',
+                            'FiraCode-Regular': 'FiraCode-Bold',
+                            'SourceCodePro-Regular': 'SourceCodePro-Bold',
+                            'Courier': 'Courier-Bold',
+                          };
+                          setFontConfig((prev) => ({
+                            ...prev,
+                            fontFamily: family,
+                            boldFamily: boldMap[family] ?? family.replace('-Regular', '-Bold'),
+                          }));
+                        }}
+                        aria-label={t('builder.fontFamily')}
+                      >
+                        <option value="SFMono-Regular">SF Mono</option>
+                        <option value="Menlo-Regular">Menlo</option>
+                        <option value="JetBrainsMono-Regular">JetBrains Mono</option>
+                        <option value="FiraCode-Regular">Fira Code</option>
+                        <option value="SourceCodePro-Regular">Source Code Pro</option>
+                        <option value="Courier">Courier</option>
+                      </select>
+                    </label>
+                    <label>
+                      <span>{t('builder.fontSize')}</span>
+                      <input
+                        type="number"
+                        min={8}
+                        max={32}
+                        value={fontConfig.fontSize}
+                        onChange={(event) => setFontConfig((prev) => ({ ...prev, fontSize: Number(event.target.value) || 13 }))}
+                        aria-label={t('builder.fontSize')}
+                      />
+                    </label>
                   </div>
                 </section>
               ) : null}

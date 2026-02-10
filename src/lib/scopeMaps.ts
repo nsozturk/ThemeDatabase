@@ -45,6 +45,60 @@ export const ROLE_SCOPES: Record<SyntaxRole, string[]> = {
     'support.type',
     'storage.type',
   ],
+  attribute: [
+    'entity.other.attribute-name',
+    'meta.decorator',
+    'support.function.attribute',
+    'meta.attribute',
+  ],
+  character: [
+    'constant.character',
+    'constant.character.escape',
+    'constant.character.numeric',
+  ],
+  preprocessor: [
+    'meta.preprocessor',
+    'keyword.control.directive',
+    'keyword.control.import',
+    'keyword.other.import',
+    'entity.name.function.preprocessor',
+  ],
+  url: [
+    'markup.underline.link',
+    'string.other.link',
+    'meta.link',
+  ],
+  regex: [
+    'string.regexp',
+    'constant.regexp',
+    'keyword.other.regex',
+  ],
+  class: [
+    'entity.name.type.class',
+    'entity.name.class',
+    'support.class',
+    'entity.other.inherited-class',
+  ],
+  constant: [
+    'constant',
+    'constant.language',
+    'variable.other.constant',
+    'support.constant',
+  ],
+  macro: [
+    'entity.name.function.preprocessor',
+    'meta.preprocessor.macro',
+    'keyword.control.directive',
+  ],
+  mark: [
+    'comment',
+    'punctuation.definition.comment',
+  ],
+  declaration: [
+    'entity.name.function',
+    'entity.name.type',
+    'entity.name.tag',
+  ],
   operator: [
     'keyword.operator',
     'punctuation.separator',

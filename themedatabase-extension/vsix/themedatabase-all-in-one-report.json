@@ -1,0 +1,10 @@
+{
+  "generatedAt": "2026-02-20T23:59:57.213Z",
+  "output": "/Users/ns0bj/Documents/vscodethemes/ThemeDatabase/themedatabase-extension/vsix/themedatabase-all-in-one-1.0.0.vsix",
+  "sizeBytes": 29731120,
+  "sizeMB": 28.35,
+  "totalThemes": 22037,
+  "icon": "themeDatabaseIcon.png",
+  "publishable": true,
+  "source": "manual-vsix-pack-with-marketplace-metadata"
+}

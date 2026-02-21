@@ -1,0 +1,5 @@
+node_modules/
+.DS_Store
+monolith-tests/
+vsix/themedatabase-all-in-one-build/
+*.log

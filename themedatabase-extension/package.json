@@ -1,0 +1,72 @@
+{
+  "name": "themedatabase",
+  "displayName": "ThemeDatabase",
+  "description": "Explore 22K+ VS Code themes by palette style, filter instantly, and install/apply on demand.",
+  "version": "0.1.0",
+  "publisher": "ns0bj",
+  "icon": "themeDatabaseIcon.png",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nsozturk/ThemeDatabase.git"
+  },
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Themes",
+    "Other"
+  ],
+  "keywords": [
+    "theme",
+    "themes",
+    "color",
+    "palette",
+    "dracula",
+    "pastel",
+    "dark",
+    "light",
+    "vscode-theme"
+  ],
+  "activationEvents": [
+    "onCommand:themedatabase.openExplorer"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "themedatabase.openExplorer",
+        "title": "ThemeDatabase: Open Explorer",
+        "category": "ThemeDatabase"
+      }
+    ],
+    "configuration": {
+      "title": "ThemeDatabase",
+      "properties": {
+        "themedatabase.dataBaseUrl": {
+          "type": "string",
+          "default": "https://nsozturk.github.io/ThemeDatabase",
+          "description": "Base URL for the ThemeDatabase dataset."
+        },
+        "themedatabase.installAndApplyByDefault": {
+          "type": "boolean",
+          "default": true,
+          "description": "Install selected extension and apply the selected theme name after install."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build:data": "node ./scripts/build-extension-data.mjs",
+    "build": "tsc -p .",
+    "clean": "rm -rf dist",
+    "watch": "tsc -p . -w",
+    "package": "npm run build:data && npm run build && vsce package --no-dependencies"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/vscode": "^1.90.0",
+    "@vscode/vsce": "^3.6.2",
+    "typescript": "^5.9.3"
+  }
+}

@@ -11,8 +11,11 @@ const PUBLIC_DATA_ROOT = path.resolve(PROJECT_ROOT, 'public', 'data');
 
 const OUT_ROOT = path.resolve(EXT_ROOT, 'vsix');
 const BUILD_DIR = path.resolve(OUT_ROOT, 'themedatabase-all-in-one-build');
-const OUTPUT_VSIX = path.resolve(OUT_ROOT, 'themedatabase-all-in-one-1.0.0.vsix');
-const OUTPUT_REPORT = path.resolve(OUT_ROOT, 'themedatabase-all-in-one-report.json');
+const EXTENSION_NAME = 'themedatabase-all-themes';
+const EXTENSION_DISPLAY_NAME = 'ThemeDatabase All Themes';
+const VERSION = '1.0.1';
+const OUTPUT_VSIX = path.resolve(OUT_ROOT, `${EXTENSION_NAME}-${VERSION}.vsix`);
+const OUTPUT_REPORT = path.resolve(OUT_ROOT, `${EXTENSION_NAME}-${VERSION}-report.json`);
 
 const ICON_PNG = path.resolve(EXT_ROOT, 'themeDatabaseIcon.png');
 const ICON_SVG = path.resolve(EXT_ROOT, 'themeDatabaseIcon.svg');
@@ -84,9 +87,11 @@ function loadExactMap() {
 }
 
 function buildReadme(totalThemes, exactCount) {
-  return `# ThemeDatabase All-in-One
+  return `# ThemeDatabase All Themes
 
-ThemeDatabase All-in-One packages the full ThemeDatabase catalog in one VSIX so you can browse and switch themes directly from VS Code's theme picker.
+**One theme database to rule them all.**
+
+This extension bundles the complete ThemeDatabase set so you can browse and switch themes directly from VS Code's built-in theme picker without extra downloads.
 
 ## Features
 
@@ -94,6 +99,26 @@ ThemeDatabase All-in-One packages the full ThemeDatabase catalog in one VSIX so 
 - Highest quality where available: **${exactCount.toLocaleString()} exact theme payloads**
 - Remaining themes use optimized fallback payloads for full coverage and manageable package size
 - Single-file distribution for easy backup, sharing, and offline installation
+- Works with VS Code theme picker out of the box
+- Marketplace-ready metadata and assets (icon, categories, links, changelog)
+
+## Why this extension
+
+ThemeDatabase All Themes is made for developers who want maximum theme variety in one installation:
+
+- No extra fetch/install step per theme
+- Fast switching via built-in \`Preferences: Color Theme\`
+- Offline-friendly setup after a single VSIX install
+
+## Screenshots
+
+### Theme Explorer
+
+![Theme explorer](https://github.com/nsozturk/ThemeDatabase/raw/main/docs/screenshots/home.png)
+
+### VSIX Builder Workflow
+
+![VSIX builder](https://github.com/nsozturk/ThemeDatabase/raw/main/docs/screenshots/vsix-builder.png)
 
 ## Details
 
@@ -101,28 +126,42 @@ ThemeDatabase All-in-One packages the full ThemeDatabase catalog in one VSIX so 
 - Package type: VS Code color themes extension
 - Supported VS Code: \`^1.70.0\`
 - Format: single \`.vsix\`
+- Source: https://github.com/nsozturk/ThemeDatabase
+- Website: https://nsozturk.github.io/ThemeDatabase/
 
-## Install
+## Install from Marketplace
 
-1. Open VS Code.
-2. Open Extensions view.
-3. Click the \`...\` menu in the top-right.
+1. Open Extensions in VS Code
+2. Search for **ThemeDatabase All Themes**
+3. Click **Install**
+4. Open command palette and run **Preferences: Color Theme**
+5. Pick any included ThemeDatabase theme
+
+## Install from VSIX
+
+1. Open VS Code
+2. Open Extensions view
+3. Click the \`...\` menu in the top-right
 4. Select **Install from VSIX...**
-5. Pick \`themedatabase-all-in-one-1.0.0.vsix\`.
+5. Pick \`${EXTENSION_NAME}-${VERSION}.vsix\`
 
 ## Notes
 
 - This package focuses on broad theme coverage in one installable artifact.
 - If you prefer lower disk usage with on-demand loading, use the main ThemeDatabase explorer extension variant.
+- Need support or want to contribute? Open an issue:
+  https://github.com/nsozturk/ThemeDatabase/issues
 `;
 }
 
 function buildChangelog(totalThemes, exactCount, fallbackCount) {
   return `# Changelog
 
-## 1.0.0
+## ${VERSION}
 
-- Initial publishable all-in-one release
+- Tagline added: "One theme database to rule them all."
+- Marketplace metadata update for icon and overview visibility
+- Extension identity finalized as \`${EXTENSION_NAME}\`
 - Included ${totalThemes.toLocaleString()} total themes in a single package
 - Exact payloads: ${exactCount.toLocaleString()}
 - Fallback payloads: ${fallbackCount.toLocaleString()}
@@ -203,12 +242,15 @@ function main() {
   process.stdout.write(`\r[build] themes: ${fallback.length}/${fallback.length}\n`);
 
   const pkg = {
-    name: 'themedatabase-all-in-one',
-    displayName: 'ThemeDatabase All-in-One',
-    description: `All ${fallback.length.toLocaleString()} ThemeDatabase themes in one VSIX package.`,
-    version: '1.0.0',
+    name: EXTENSION_NAME,
+    displayName: EXTENSION_DISPLAY_NAME,
+    description: `One theme database to rule them all. All ${fallback.length.toLocaleString()} ThemeDatabase themes in one VSIX package.`,
+    version: VERSION,
     publisher: 'ns0bj',
     icon: 'themeDatabaseIcon.png',
+    preview: false,
+    markdown: 'github',
+    qna: 'marketplace',
     license: 'MIT',
     repository: {
       type: 'git',
@@ -221,16 +263,21 @@ function main() {
     engines: {
       vscode: '^1.70.0',
     },
-    categories: ['Themes'],
+    categories: ['Themes', 'Other'],
     keywords: [
       'themes',
       'vscode-theme',
       'theme-database',
+      'one-theme-database-to-rule-them-all',
       'dark-theme',
       'light-theme',
       'pastel-theme',
       'all-in-one',
     ],
+    galleryBanner: {
+      color: '#0f1020',
+      theme: 'dark',
+    },
     contributes: {
       themes: contributesThemes,
     },
@@ -261,6 +308,8 @@ function main() {
   const report = {
     generatedAt: new Date().toISOString(),
     output: OUTPUT_VSIX,
+    extensionName: EXTENSION_NAME,
+    version: VERSION,
     sizeBytes,
     sizeMB: Number((sizeBytes / 1024 / 1024).toFixed(2)),
     totalThemes: fallback.length,

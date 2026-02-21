@@ -1,0 +1,15 @@
+{
+  "generatedAt": "2026-02-21T00:45:59.433Z",
+  "output": "/Users/ns0bj/Documents/vscodethemes/ThemeDatabase/themedatabase-extension/vsix/themedatabase-all-themes-1.0.1.vsix",
+  "extensionName": "themedatabase-all-themes",
+  "version": "1.0.1",
+  "sizeBytes": 30701166,
+  "sizeMB": 29.28,
+  "totalThemes": 22037,
+  "categories": [
+    "Themes",
+    "Other"
+  ],
+  "keywordsCount": 8,
+  "visibilityHint": "Public (GalleryFlags in VSIX manifest)"
+}
